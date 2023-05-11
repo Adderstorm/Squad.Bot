@@ -1,0 +1,18 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SquadBot_Application.Models.AI
+{
+    [Table("newMembersActivity")]
+    public class NewMembersActivity
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("id")]
+        public int Id { get; set; }
+        [Required]
+        public NewMembers NewMembers { get; set; } = null!;
+        [Column("createdAt")]
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+    }
+}
