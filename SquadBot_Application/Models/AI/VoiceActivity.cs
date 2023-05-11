@@ -11,11 +11,15 @@ namespace SquadBot_Application.Models.AI
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("id")]
         public int Id { get; set; }
-        [Required]
+
         [Column("serverId")]
+        [Required]
         public Servers Server { get; set; } = null!;
+
+        [Column("totalMinutes")]
         [Required]
         public int TotalMinutes { get; set; } = 0;
+
         [Column("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }

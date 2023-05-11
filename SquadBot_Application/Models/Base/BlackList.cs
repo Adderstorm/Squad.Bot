@@ -18,6 +18,7 @@ namespace SquadBot_Application.Models.Base
         [Required]
         [Column("serverId")]
         public Servers Server { get; set; } = null!;
+
         [Column("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }

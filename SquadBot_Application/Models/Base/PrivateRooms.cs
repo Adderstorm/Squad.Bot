@@ -10,10 +10,15 @@ namespace SquadBot_Application.Models.Base
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("id")]
         public int Id { get; set; }
+
         [Required]
         [Column("serverId")]
         public Servers Server { get; set; } = null!;
+
+        [Column("categoryId")]
         public int CategoryID { get; set; }
+
+        [Column("channelId")]
         public int ChannelID { get; set; }
     }
 }

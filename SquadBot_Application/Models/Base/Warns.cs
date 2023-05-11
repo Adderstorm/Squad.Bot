@@ -11,17 +11,20 @@ namespace SquadBot_Application.Models.Base
         [Column("id")]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Field Warns.User must contain user that you want to warn")]
         [Column("userId")]
+        [Required(ErrorMessage = "Field Warns.User must contain user that you want to warn")]
         public Users User { get; set; } = null!;
 
         [Required]
         [Column("serverId")]
         public Servers Server { get; set; } = null!;
 
+        [Column("moderatorId")]
         public int ModeratorID { get; set; }
 
+        [Column("reason")]
         [Required(ErrorMessage = "You must to specify a reason")]
+        [MaxLength(150)]
         public string Reason { get; set; } = string.Empty;
 
         [Column("createdAt")]
