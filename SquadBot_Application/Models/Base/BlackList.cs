@@ -18,6 +18,11 @@ namespace SquadBot_Application.Models.Base
         [Required]
         [Column("serverId")]
         public Servers Server { get; set; } = null!;
+        
+        [Column("reason")]
+        [Required(ErrorMessage = "You must to specify a reason")]
+        [MaxLength(150)]
+        public string Reason { get; set; } = null!;
 
         [Column("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
