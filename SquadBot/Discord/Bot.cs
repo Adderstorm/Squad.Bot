@@ -31,23 +31,21 @@ namespace SquadBot.Discord
             _configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true)
                 .Build();
+            
+            var options = new DbContextOptionsBuilder<SquadDBContext>()
+                .UseSqlite(config.DbOptions)
+                .Options;
 
             // Add services to dependency injection
             _services = new ServiceCollection()
                 .AddSingleton(_socketConfig)
                 .AddSingleton(_configuration)
-                .AddSingleton<SquadDBContext>()
+                .AddSingleton(new SquadDBContext(options))
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
                 .AddSingleton<InteractionHandler>()
                 .AddSingleton(config)
                 .BuildServiceProvider();
-
-            var options = new DbContextOptionsBuilder<SquadDBContext>()
-                .UseSqlite(config.DbOptions)
-                .Options;
-
-            SquadDBContext dBContext = new(options);
         }
 
         internal static bool IsDebug()
