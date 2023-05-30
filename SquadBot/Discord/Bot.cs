@@ -5,6 +5,7 @@ using SquadBot_Application.Models;
 using System;
 using Discord.Interactions;
 using Microsoft.Extensions.Configuration;
+using SquadBot.Data;
 
 namespace SquadBot.Discord
 {
@@ -33,6 +34,7 @@ namespace SquadBot.Discord
             _services = new ServiceCollection()
                 .AddSingleton(_socketConfig)
                 .AddSingleton(_configuration)
+                .AddSingleton<SquadDBContext>()
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
                 .AddSingleton<InteractionHandler>()

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SquadBot_Application.Models.Base
+namespace SquadBot.Models.Base
 {
     [Table("users")]
     public class Users

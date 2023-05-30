@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SquadBot_Application.Models.AI;
-using SquadBot_Application.Models.Base;
+using SquadBot.Models.AI;
+using SquadBot.Models.Base;
 
-namespace SquadBot_Application.Data
+namespace SquadBot.Data
 {
     public class SquadDBContext : DbContext
     {

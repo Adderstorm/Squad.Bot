@@ -1,11 +1,11 @@
-﻿using SquadBot_Application.Models.Base;
+﻿using SquadBot.Models.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SquadBot_Application.Models.AI
+namespace SquadBot.Models.AI
 {
-    [Table("membersActivity")]
-    public class MembersActivity
+    [Table("totalLeaves")]
+    public class TotalLeaves
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -20,7 +20,7 @@ namespace SquadBot_Application.Models.AI
         [Required]
         public Servers Server { get; set; } = null!;
 
-        [Column("lastActivityDate")]
-        public DateTime LastActivityDate { get; set; } = DateTime.Now;
+        [Column("createdAt")]
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

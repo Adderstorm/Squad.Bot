@@ -1,6 +1,5 @@
 
 using SquadBot_Application.Constants;
-using SquadBot_Application.Data;
 
 namespace SquadBot_Application
 {
@@ -16,8 +15,6 @@ namespace SquadBot_Application
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
-            builder.Services.AddSqlite<SquadDBContext>("Data Source=SquadDb.db");
 
             builder.Services.AddAuthentication()
                 .AddJwtBearer(options =>
@@ -41,8 +38,6 @@ namespace SquadBot_Application
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
-            app.CreateDbIfNotExists();
 
             app.UseHttpsRedirection();
 

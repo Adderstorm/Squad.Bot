@@ -1,23 +1,23 @@
-﻿using SquadBot_Application.Models.Base;
+﻿using SquadBot.Models.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SquadBot_Application.Models.AI
+namespace SquadBot.Models.AI
 {
-    [Table("newMembers")]
-    public class NewMembers
+    [Table("joinDate")]
+    public class JoinDate
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("id")]
         public int Id { get; set; }
 
-        [Column("userId")]
         [Required]
+        [Column("userId")]
         public Users User { get; set; } = null!;
 
-        [Column("serverId")]
         [Required]
+        [Column("serverId")]
         public Servers Server { get; set; } = null!;
 
         [Column("createdAt")]

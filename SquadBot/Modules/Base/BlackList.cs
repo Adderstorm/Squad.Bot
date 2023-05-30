@@ -1,31 +1,28 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SquadBot_Application.Models.Base
+namespace SquadBot.Models.Base
 {
-    [Table("warns")]
-    public class Warns
+    [Table("blacklist")]
+    public class BlackList
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("id")]
         public int Id { get; set; }
 
+        [Required(ErrorMessage = "You must to put a user for add in blacklist")]
         [Column("userId")]
-        [Required(ErrorMessage = "Field Warns.User must contain user that you want to warn")]
         public Users User { get; set; } = null!;
 
         [Required]
         [Column("serverId")]
         public Servers Server { get; set; } = null!;
-
-        [Column("moderatorId")]
-        public int ModeratorID { get; set; }
-
+        
         [Column("reason")]
         [Required(ErrorMessage = "You must to specify a reason")]
         [MaxLength(150)]
-        public string Reason { get; set; } = string.Empty;
+        public string Reason { get; set; } = null!;
 
         [Column("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;

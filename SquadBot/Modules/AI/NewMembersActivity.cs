@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SquadBot_Application.Models.AI
+namespace SquadBot.Models.AI
 {
     [Table("newMembersActivity")]
     public class NewMembersActivity
