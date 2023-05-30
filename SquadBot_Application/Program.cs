@@ -1,4 +1,5 @@
 
+using SquadBot_Application.Constants;
 using SquadBot_Application.Data;
 
 namespace SquadBot_Application
@@ -17,6 +18,20 @@ namespace SquadBot_Application
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddSqlite<SquadDBContext>("Data Source=SquadDb.db");
+
+            builder.Services.AddAuthentication()
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = AuthOptions.ISSUER,
+                        ValidateAudience = true,
+                        ValidAudience = AuthOptions.AUDIENCE,
+                        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                        ValidateIssuerSigningKey = true
+                    };
+                });
 
             var app = builder.Build();
 

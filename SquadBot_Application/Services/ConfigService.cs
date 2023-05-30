@@ -7,9 +7,9 @@ using System.Text.Json;
 
 namespace SquadBot_Application.Services
 {
-    public class ConfigService
+    public class ConfigService : Config
     {
-        public static void AddToken(string token)
+        public static Config AddToken(string token)
         {
             Config? config;
             if (File.Exists(PathConstants.ConfigFile))
@@ -29,11 +29,11 @@ namespace SquadBot_Application.Services
                     Token = token
                 };
             }
-            SerializeConfigToFile(config);
-            return;
+            SerializeConfigToFile(config, TypeDataSerialize.Token);
+            return config;
         }
 
-        public static void UpdateToken(string token)
+        public static Config UpdateToken(string token)
         {
             
             if(!File.Exists(PathConstants.ConfigFile))
@@ -42,10 +42,10 @@ namespace SquadBot_Application.Services
             string configString = File.ReadAllText(PathConstants.ConfigFile);
             Config? config = JsonSerializer.Deserialize<Config>(configString);
             config.Token = token;
-            SerializeConfigToFile(config);
-            return;
+            SerializeConfigToFile(config, TypeDataSerialize.Token);
+            return config;
         }
-        public static void AddConfig(Config config)
+        public static Config AddConfig(Config config)
         {
             if (File.Exists(PathConstants.ConfigFile))
             {
@@ -58,10 +58,10 @@ namespace SquadBot_Application.Services
                 else
                     config.Token = existedConfig.Token;
             }
-            SerializeConfigToFile(config);
-            return;
+            SerializeConfigToFile(config, TypeDataSerialize.Config);
+            return config;
         }
-        public static void UpdateConfig(Config config)
+        public static Config UpdateConfig(Config config)
         {
             if(!File.Exists(PathConstants.ConfigFile))
                 throw new Exception("Config file doesn't exist");
@@ -71,14 +71,41 @@ namespace SquadBot_Application.Services
             config.Token ??= existedConfig.Token;
             config.TotalShards ??= existedConfig.TotalShards;
             config.DbOptions ??= existedConfig.DbOptions;
-            SerializeConfigToFile(config);
-            return;
+            SerializeConfigToFile(config, TypeDataSerialize.Config);
+            return config;
         }
-        private static void SerializeConfigToFile(Config config)
+
+        public static Config? GetConfig()
+        {
+            if (!File.Exists(PathConstants.ConfigFile))
+                throw new Exception("Config file doesn't exist");
+
+            string ConfigString = File.ReadAllText(PathConstants.ConfigFile);
+            Config? Config = JsonSerializer.Deserialize<Config>(ConfigString);
+
+            return Config;
+        }
+
+        private enum TypeDataSerialize
+        {
+            Config,
+            Token
+        }
+
+        private static void SerializeConfigToFile(Config config, TypeDataSerialize type)
         {
             using FileStream fs = new(PathConstants.ConfigFile, FileMode.OpenOrCreate);
             JsonSerializer.Serialize(fs, config);
-            Logger.LogInfo("Data has been saved to file");
+
+            switch (type)
+            {
+                case TypeDataSerialize.Config:
+                    Logger.LogInfo("Config has been saved to file");
+                    break;
+                case TypeDataSerialize.Token:
+                    Logger.LogInfo("Token has been saved to file");
+                    break;
+            }
             return;
         }
     }

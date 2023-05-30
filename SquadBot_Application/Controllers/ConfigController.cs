@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SquadBot_Application.Logging;
 using SquadBot_Application.Models;
@@ -9,9 +10,11 @@ namespace SquadBot_Application.Controllers
 {
     [Controller]
     [Route("api/[controller]/[action]")]
+    [Authorize]
     public class ConfigController : Controller
     {
-        [HttpPost(Name ="tokenPost")]
+        [ActionName("postToken")]
+        [HttpPost]
         public ActionResult PostToken(string token)
         {
             try
@@ -33,7 +36,8 @@ namespace SquadBot_Application.Controllers
             return Ok();
         }
 
-        [HttpPut(Name ="tokenUpdate")]
+        [ActionName("updateToken")]
+        [HttpPut]
         public ActionResult UpdateToken(string token) 
         {
             try
@@ -55,7 +59,8 @@ namespace SquadBot_Application.Controllers
             return Ok();
         }
 
-        [HttpPost(Name ="configPost")]
+        [ActionName("postConfig")]
+        [HttpPost]
         public ActionResult PostConfig(Config config = null!)
         {
             try
@@ -70,7 +75,8 @@ namespace SquadBot_Application.Controllers
             return Ok();
         }
 
-        [HttpPut(Name ="configUpdate")]
+        [ActionName("updateConfig")]
+        [HttpPut]
         public ActionResult UpdateConfig(Config config = null!)
         {
             try
