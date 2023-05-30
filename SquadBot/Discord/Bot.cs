@@ -32,10 +32,6 @@ namespace SquadBot.Discord
                 .AddJsonFile("appsettings.json", optional: true)
                 .Build();
 
-            var options = new DbContextOptionsBuilder<SquadDBContext>()
-                .UseSqlite(config.DbOptions)
-                .Options;   
-
             // Add services to dependency injection
             _services = new ServiceCollection()
                 .AddSingleton(_socketConfig)
@@ -46,6 +42,10 @@ namespace SquadBot.Discord
                 .AddSingleton<InteractionHandler>()
                 .AddSingleton(config)
                 .BuildServiceProvider();
+
+            var options = new DbContextOptionsBuilder<SquadDBContext>()
+                .UseSqlite(config.DbOptions)
+                .Options;
 
             SquadDBContext dBContext = new(options);
         }
