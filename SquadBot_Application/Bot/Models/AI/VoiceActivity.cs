@@ -1,11 +1,11 @@
-﻿using SquadBot.Models.Base;
+﻿using SquadBot_Application.Bot.Models.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SquadBot.Models.AI
+namespace SquadBot_Application.Bot.Models.AI
 {
-    [Table("peakOnline")]
-    public class PeakOnline
+    [Table("voiceActivity")]
+    public class VoiceActivity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -16,8 +16,9 @@ namespace SquadBot.Models.AI
         [Required]
         public Servers Server { get; set; } = null!;
 
-        [Column("peak")]
-        public int Peak { get; set; } = 0;
+        [Column("totalMinutes")]
+        [Required]
+        public int TotalMinutes { get; set; } = 0;
 
         [Column("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;

@@ -81,9 +81,7 @@ namespace SquadBot_Application.Services
                 throw new Exception("Config file doesn't exist");
 
             string ConfigString = File.ReadAllText(PathConstants.ConfigFile);
-            Config? Config = JsonSerializer.Deserialize<Config>(ConfigString);
-
-            return Config;
+            return JsonSerializer.Deserialize<Config>(ConfigString);
         }
 
         private enum TypeDataSerialize

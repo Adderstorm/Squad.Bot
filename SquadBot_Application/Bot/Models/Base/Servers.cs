@@ -1,9 +1,8 @@
-﻿using SquadBot.Models.AI;
+﻿using SquadBot_Application.Bot.Models.AI;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.CompilerServices;
 
-namespace SquadBot.Models.Base
+namespace SquadBot_Application.Bot.Models.Base
 {
     [Table("servers")]
     public class Servers

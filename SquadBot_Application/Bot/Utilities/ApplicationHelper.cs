@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SquadBot.Utilities
+namespace SquadBot_Application.Bot.Utilities
 {
     public static class ApplicationHelper
     {

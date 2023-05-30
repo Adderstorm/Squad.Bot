@@ -4,7 +4,7 @@ using Discord;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 
-namespace SquadBot.Discord
+namespace SquadBot_Application.Bot.Discord
 {
     internal class InteractionHandler
     {
@@ -37,7 +37,7 @@ namespace SquadBot.Discord
         {
             // Context & Slash commands can be automatically registered, but this process needs to happen after the client enters the READY state.
             // Since Global Commands take around 1 hour to register, we should use a test guild to instantly update and test our commands.
-            if (Bot.IsDebug())
+            if (BotApp.IsDebug())
                 await _handler.RegisterCommandsToGuildAsync(_configuration.GetValue<ulong>("testGuild"), true);
             else
                 await _handler.RegisterCommandsGloballyAsync(true);

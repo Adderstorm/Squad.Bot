@@ -1,11 +1,11 @@
-﻿using SquadBot.Models.Base;
+﻿using SquadBot_Application.Bot.Models.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SquadBot.Models.AI
+namespace SquadBot_Application.Bot.Models.AI
 {
-    [Table("memberMessagesActivity")]
-    public class MemberMessagesActivity
+    [Table("totalLeaves")]
+    public class TotalLeaves
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -19,9 +19,6 @@ namespace SquadBot.Models.AI
         [Column("serverId")]
         [Required]
         public Servers Server { get; set; } = null!;
-
-        [Column("totalMessages")]
-        public int TotalMessages { get; set; } = 0;
 
         [Column("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;

@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using SquadBot.Models.Base;
+using SquadBot_Application.Bot.Models.Base;
 
-namespace SquadBot.Models.AI
+namespace SquadBot_Application.Bot.Models.AI
 {
     [Table("totalMembers")]
     public class TotalMembers

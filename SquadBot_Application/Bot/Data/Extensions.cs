@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace SquadBot.Data
+namespace SquadBot_Application.Bot.Data
 {
     public static class Extensions
     {

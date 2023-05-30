@@ -1,16 +1,29 @@
 ﻿using Discord;
-using SquadBot.Discord;
-using SquadBot.Utilities;
-using SquadBot.Logging;
-using SquadBot.Models;
+using SquadBot_Application.Bot.Utilities;
+using SquadBot_Application.Bot.Discord;
+using SquadBot_Application.Logging;
+using SquadBot_Application.Models;
 
-namespace SquadBot
+namespace SquadBot_Application.Services
 {
-    public class Program
+    public class BotService
     {
-        public static void Main()
+        private static Thread? thread;
+        public static void StartThread()
         {
-            Config? config = (Config?)ConfigService.GetConfig(ConfigService.ConfigType.Config);
+            thread ??= new(new ThreadStart(Main));
+
+            thread.Priority = ThreadPriority.Highest;
+            thread.Start();
+        }
+
+        public static void StopThread()
+        {
+            thread?.Interrupt();
+        }
+        private static void Main()
+        {
+            Config? config = ConfigService.GetConfig();
 
             try
             {
@@ -22,7 +35,7 @@ namespace SquadBot
                 ApplicationHelper.AnnounceAndExit();
             }
 
-            var bot = new Bot(config.Token, config);
+            var bot = new BotApp(config);
 
             // Start the bot in async context from a sync context
             var closingException = bot.RunAsync().GetAwaiter().GetResult();

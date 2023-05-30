@@ -1,22 +1,18 @@
 ﻿using Discord.WebSocket;
 using Discord;
-using Microsoft.Extensions.DependencyInjection;
 using SquadBot_Application.Models;
-using System;
 using Discord.Interactions;
-using Microsoft.Extensions.Configuration;
-using SquadBot.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
+using SquadBot_Application.Bot.Data;
 
-namespace SquadBot.Discord
+namespace SquadBot_Application.Bot.Discord
 {
-    internal class Bot
+    internal class BotApp
     {
-        private readonly string? _discordBotToken;
         private readonly IServiceProvider _services;
         private readonly IConfiguration _configuration;
-        
+        private readonly Config? _config;
+
         private readonly DiscordSocketConfig _socketConfig = new()
         {
             GatewayIntents = GatewayIntents.All,
@@ -24,14 +20,14 @@ namespace SquadBot.Discord
             AlwaysDownloadUsers = true
         };
 
-        public Bot(string? discordBotToken, Config config)
+        public BotApp(Config? config)
         {
-            _discordBotToken = discordBotToken;
+            _config = config;
 
             _configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true)
                 .Build();
-            
+
             var options = new DbContextOptionsBuilder<SquadDBContext>()
                 .UseSqlite(config.DbOptions)
                 .Options;
@@ -44,7 +40,6 @@ namespace SquadBot.Discord
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
                 .AddSingleton<InteractionHandler>()
-                .AddSingleton(config)
                 .BuildServiceProvider();
         }
 
@@ -67,7 +62,7 @@ namespace SquadBot.Discord
                 .InitializeAsync();
 
                 // Login and start bot
-                await _discordClient.LoginAsync(TokenType.Bot, _discordBotToken);
+                await _discordClient.LoginAsync(TokenType.Bot, _config.Token);
                 await _discordClient.StartAsync();
 
                 // Block the task indefinitely

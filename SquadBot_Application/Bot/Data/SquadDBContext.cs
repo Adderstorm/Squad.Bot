@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SquadBot.Models.AI;
-using SquadBot.Models.Base;
+using SquadBot_Application.Bot.Models.AI;
+using SquadBot_Application.Bot.Models.Base;
 
-namespace SquadBot.Data
+namespace SquadBot_Application.Bot.Data
 {
     public class SquadDBContext : DbContext
     {
-        public SquadDBContext(DbContextOptions<SquadDBContext> options) : base(options) 
+        public SquadDBContext(DbContextOptions<SquadDBContext> options) : base(options)
         {
         }
-        
+
         public DbSet<BlackList> BlackList { get; set; }
         public DbSet<PrivateRooms> PrivateRooms { get; set; }
         public DbSet<Servers> Servers { get; set; }

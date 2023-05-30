@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SquadBot_Application.Services;
 
 namespace SquadBot_Application.Controllers
 {
@@ -12,7 +13,8 @@ namespace SquadBot_Application.Controllers
         [HttpGet]
         public ActionResult StartBot()
         {
-            return View();
+            BotService.StartThread();
+            return Ok();
         }
 
         [ActionName("stopBot")]
@@ -28,6 +30,5 @@ namespace SquadBot_Application.Controllers
         { 
             return View();
         }
-
     }
 }
