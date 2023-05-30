@@ -6,6 +6,8 @@ using System;
 using Discord.Interactions;
 using Microsoft.Extensions.Configuration;
 using SquadBot.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace SquadBot.Discord
 {
@@ -30,6 +32,10 @@ namespace SquadBot.Discord
                 .AddJsonFile("appsettings.json", optional: true)
                 .Build();
 
+            var options = new DbContextOptionsBuilder<SquadDBContext>()
+                .UseSqlite(config.DbOptions)
+                .Options;   
+
             // Add services to dependency injection
             _services = new ServiceCollection()
                 .AddSingleton(_socketConfig)
@@ -41,6 +47,7 @@ namespace SquadBot.Discord
                 .AddSingleton(config)
                 .BuildServiceProvider();
 
+            SquadDBContext dBContext = new(options);
         }
 
         internal static bool IsDebug()

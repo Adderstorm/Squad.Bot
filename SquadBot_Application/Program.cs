@@ -1,4 +1,3 @@
-
 using SquadBot_Application.Constants;
 
 namespace SquadBot_Application
