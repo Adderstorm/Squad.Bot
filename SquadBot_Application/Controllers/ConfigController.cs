@@ -8,10 +8,10 @@ using System;
 
 namespace SquadBot_Application.Controllers
 {
-    [Controller]
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    [Authorize]
-    public class ConfigController : Controller
+    //[Authorize]
+    public class ConfigController : ControllerBase
     {
         [ActionName("postToken")]
         [HttpPost]
@@ -22,15 +22,15 @@ namespace SquadBot_Application.Controllers
                 TokenUtils.ValidateToken(TokenType.Bot, token);
                 ConfigService.AddToken(token);
             }
-            catch (ArgumentException)
+            catch (Exception ex) when (ex is ArgumentException || ex is ArgumentNullException)
             {
-                Logger.LogError("Discord Bot token validation error");
-                return ValidationProblem("Discord Bot token is invalid, please check it and try send again");
+                Logger.LogError("Discord Bot token validation error ", ex);
+                return ValidationProblem("Discord Bot token is invalid or null, please check it and try again");
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                Logger.LogError("Post token error");
-                return ValidationProblem($"Uncaught error: {exception.Message}");
+                Logger.LogError("Post token error ", ex);
+                return BadRequest($"Uncaught error: {ex.Message}");
             }
             Logger.LogInfo("Token was succesfully added and saved");
             return Ok();
@@ -45,15 +45,15 @@ namespace SquadBot_Application.Controllers
                 TokenUtils.ValidateToken(TokenType.Bot, token);
                 ConfigService.UpdateToken(token);
             }
-            catch (ArgumentException)
+            catch (Exception ex) when (ex is ArgumentException|| ex is ArgumentNullException)
             {
-                Logger.LogError("Discord Bot token validation error");
-                return ValidationProblem("Discord Bot token is invalid, please check it and try send again");
+                Logger.LogError("Discord Bot token validation error ", ex);
+                return ValidationProblem("Discord Bot token is invalid or null, please check it and try again");
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                Logger.LogError($"{exception.Message}");
-                return ValidationProblem($"Uncaught error: {exception.Message}");
+                Logger.LogError("Update token error ", ex);
+                return BadRequest($"Uncaught error: {ex.Message}");
             }
             Logger.LogInfo("Token was succesfully updated");
             return Ok();
@@ -63,13 +63,16 @@ namespace SquadBot_Application.Controllers
         [HttpPost]
         public ActionResult PostConfig(Config config = null!)
         {
+            if (config == null)
+                return BadRequest();
             try
             {
                 ConfigService.AddConfig(config);
             }
-            catch(Exception exception)
+            catch(Exception ex)
             {
-                return BadRequest($"Uncaught error: {exception.Message}");
+                Logger.LogError("Post Config error ", ex);
+                return BadRequest($"Uncaught error: {ex.Message}");
             }
             Logger.LogInfo("Config was succesfully added and saved");
             return Ok();
@@ -79,13 +82,16 @@ namespace SquadBot_Application.Controllers
         [HttpPut]
         public ActionResult UpdateConfig(Config config = null!)
         {
+            if (config == null)
+                return BadRequest();
             try
             {
                 ConfigService.UpdateConfig(config);
             }
-            catch(Exception exception)
+            catch(Exception ex)
             {
-                return new BadRequestObjectResult($"Uncaught error: {exception.Message}");
+                Logger.LogError("Update Config error ", ex);
+                return BadRequest($"Uncaught error: {ex.Message}");
             }
             Logger.LogInfo("Config was succesfully updated");
             return Ok();

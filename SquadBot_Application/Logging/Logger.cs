@@ -1,6 +1,4 @@
-﻿using Discord;
-
-namespace SquadBot_Application.Logging
+﻿namespace SquadBot_Application.Logging
 {
     public static class Logger
     {
@@ -23,15 +21,14 @@ namespace SquadBot_Application.Logging
                     if (logMessage.HasException)
                     {
                         Console.WriteLine();
-                        Console.WriteLine(logMessage.Exception.ToString());
+                        Console.WriteLine(logMessage.Exception.Message.ToString());
                     }
 
                     LogTasks = LogTasks.Where(x => !x.IsCanceled && !x.IsCompleted && !x.IsCompletedSuccessfully && !x.IsFaulted).ToList();
                 }
             }));
-
-
         }
+
         private static void PrintSeverityPrefix(LogType severity)
         {
             // Looks like '[Info]' but adds color to the inner text, and restore the old color

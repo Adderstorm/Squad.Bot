@@ -4,6 +4,7 @@ using SquadBot_Application.Models;
 using Discord.Interactions;
 using Microsoft.EntityFrameworkCore;
 using SquadBot_Application.Bot.Data;
+using SquadBot_Application.Bot.DisLogging;
 
 namespace SquadBot_Application.Bot.Discord
 {
@@ -27,6 +28,8 @@ namespace SquadBot_Application.Bot.Discord
             _configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true)
                 .Build();
+
+            _socketConfig.TotalShards = _config.TotalShards;
 
             var options = new DbContextOptionsBuilder<SquadDBContext>()
                 .UseSqlite(config.DbOptions)
@@ -64,6 +67,8 @@ namespace SquadBot_Application.Bot.Discord
                 // Login and start bot
                 await _discordClient.LoginAsync(TokenType.Bot, _config.Token);
                 await _discordClient.StartAsync();
+
+                DisLogger.LogInfo("Bot has started");
 
                 // Block the task indefinitely
                 await Task.Delay(Timeout.Infinite);

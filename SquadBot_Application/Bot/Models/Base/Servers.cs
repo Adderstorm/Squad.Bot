@@ -10,7 +10,7 @@ namespace SquadBot_Application.Bot.Models.Base
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Column("serverName")]
         [Required(ErrorMessage = "Field serverName must contain the server name")]

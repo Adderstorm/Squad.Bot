@@ -11,32 +11,51 @@ namespace SquadBot_Application.Services
         private static Thread? thread;
         public static void StartThread()
         {
-            thread ??= new(new ThreadStart(Main));
+            thread ??= new(new ThreadStart(BotMain));
 
             thread.Priority = ThreadPriority.Highest;
-            thread.Start();
+            if (thread.ThreadState == ThreadState.Unstarted)
+                thread.Start();
+            else
+                throw new Exception("Bot thread already started.");
         }
 
         public static void StopThread()
         {
+            if (thread == null || thread.ThreadState == ThreadState.Unstarted)
+                throw new Exception("Bot thread is not running or empty");
+
             thread?.Interrupt();
         }
-        private static void Main()
+        public static ThreadState GetThreadState()
         {
-            Config? config = ConfigService.GetConfig();
+            if (thread == null || thread.ThreadState == ThreadState.Unstarted)
+                throw new Exception("Thread are null or unstarted");
 
+            return thread.ThreadState;
+        }
+        private static void BotMain()
+        {
+            Config? config = new();
             try
             {
+                config = ConfigService.GetConfig();
                 TokenUtils.ValidateToken(TokenType.Bot, config.Token);
             }
-            catch
+            catch(Exception ex) when (ex is ArgumentException || ex is ArgumentNullException)
             {
-                Logger.LogError("The discord bot token was invalid, please check the value :" + config.Token);
-                ApplicationHelper.AnnounceAndExit();
+                Logger.LogError("The discord bot token was invalid, please check the value :" + config.Token,ex);
+                //ApplicationHelper.AnnounceAndExit();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Config file doesn't exist, please paste the configuration settings", ex);
+                //ApplicationHelper.AnnounceAndExit();
             }
 
             var bot = new BotApp(config);
 
+            Logger.LogInfo("Bot gonna start now");
             // Start the bot in async context from a sync context
             var closingException = bot.RunAsync().GetAwaiter().GetResult();
 

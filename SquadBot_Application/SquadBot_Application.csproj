@@ -24,7 +24,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\AI Processed\" />
+    <Folder Include="Bot\Models\AI Processed\" />
+    <Folder Include="Bot\DsEvents\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Properties\config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

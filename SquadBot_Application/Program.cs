@@ -15,19 +15,19 @@ namespace SquadBot_Application
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddAuthentication()
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidIssuer = AuthOptions.ISSUER,
-                        ValidateAudience = true,
-                        ValidAudience = AuthOptions.AUDIENCE,
-                        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                        ValidateIssuerSigningKey = true
-                    };
-                });
+            //builder.Services.AddAuthentication()
+            //    .AddJwtBearer(options =>
+            //    {
+            //        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+            //        {
+            //            ValidateIssuer = true,
+            //            ValidIssuer = AuthOptions.ISSUER,
+            //            ValidateAudience = true,
+            //            ValidAudience = AuthOptions.AUDIENCE,
+            //            IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+            //            ValidateIssuerSigningKey = true
+            //        };
+            //    });
 
             var app = builder.Build();
 

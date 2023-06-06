@@ -1,34 +1,62 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SquadBot_Application.Logging;
 using SquadBot_Application.Services;
 
 namespace SquadBot_Application.Controllers
 {
-    [Controller]
+    [ApiController]
     [Route("api/[controller]/[action]")]
-    [Authorize]
-    public class BotController : Controller
+    //[Authorize]
+    public class BotController : ControllerBase
     {
         [ActionName("startBot")]
         [HttpGet]
         public ActionResult StartBot()
         {
-            BotService.StartThread();
-            return Ok();
+            try
+            {
+                BotService.StartThread();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error has occurred: ", ex);
+                return BadRequest(ex.Message);
+            }
+            return Ok("Thread has started");
         }
 
         [ActionName("stopBot")]
         [HttpGet]
         public ActionResult StopBot() 
-        { 
-            return View(); 
+        {
+            try
+            {
+                BotService.StopThread();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error has occurred: ", ex);
+                return BadRequest(ex.Message);
+            }
+            return Ok("Thread has stoped"); 
         }
 
-        [ActionName("stats")]
+        [ActionName("getBotThreadStat")]
         [HttpGet]
         public ActionResult Statistics() 
-        { 
-            return View();
+        {
+            ThreadState state;
+            try
+            {
+                state = BotService.GetThreadState();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error has occurred: ", ex);
+                return BadRequest(ex.Message);
+            }
+            return Ok(state.ToString());
         }
     }
 }
