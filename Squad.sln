@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SquadBot_Application", "SquadBot_Application\SquadBot_Application.csproj", "{91C843F7-1C24-4C82-AAE6-ECF3F87ACA7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squad.Bot", "SquadBot_Application\Squad.Bot.csproj", "{91C843F7-1C24-4C82-AAE6-ECF3F87ACA7F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
