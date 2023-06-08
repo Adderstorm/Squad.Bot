@@ -58,5 +58,27 @@ namespace SquadBot_Application.Controllers
             }
             return Ok(state.ToString());
         }
+
+        [ActionName("setServersToLog")]
+        [HttpPost("{serverId}")]
+        public ActionResult SetServersToLog(long serverId)
+        {
+
+            try
+            {
+                BotService.SetServerToLog(serverId);
+                return Ok("Server has added");
+            }
+            catch (ArgumentException ex)
+            {
+                Logger.LogError("", ex);
+                return BadRequest(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                Logger.LogError("Uncaught error: ", ex);
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

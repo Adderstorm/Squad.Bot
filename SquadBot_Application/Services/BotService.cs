@@ -3,12 +3,22 @@ using SquadBot_Application.Bot.Utilities;
 using SquadBot_Application.Bot.Discord;
 using SquadBot_Application.Logging;
 using SquadBot_Application.Models;
+using SquadBot_Application.Bot.Data;
+using SquadBot_Application.Bot.Models.Bot_special;
 
 namespace SquadBot_Application.Services
 {
     public class BotService
     {
         private static Thread? thread;
+
+        private static BotDBContext? _dbContext;
+
+        public BotService(BotDBContext? dBContext) 
+        {
+            _dbContext = dBContext;
+        }
+
         public static void StartThread()
         {
             thread ??= new(new ThreadStart(BotMain));
@@ -34,6 +44,15 @@ namespace SquadBot_Application.Services
 
             return thread.ThreadState;
         }
+
+        public static void SetServerToLog(long serverId)
+        {
+            if (_dbContext.ServersToLogData.FirstOrDefault(p => p.ServerID == serverId) == null)
+                _dbContext.ServersToLogData.Add(new ServersToLogData { ServerID = serverId });
+            else
+                throw new ArgumentException("Server already has added");
+        }
+
         private static void BotMain()
         {
             Config? config = new();

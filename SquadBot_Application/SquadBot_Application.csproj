@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Bot\Models\AI Processed\" />
     <Folder Include="Bot\DsEvents\" />
   </ItemGroup>
 

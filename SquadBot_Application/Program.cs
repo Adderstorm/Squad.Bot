@@ -1,3 +1,4 @@
+using SquadBot_Application.Bot.Data;
 using SquadBot_Application.Constants;
 
 namespace SquadBot_Application
@@ -14,6 +15,8 @@ namespace SquadBot_Application
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddSqlite<BotDBContext>("DataSource={BotDBContext.db}");
 
             //builder.Services.AddAuthentication()
             //    .AddJwtBearer(options =>
