@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace SquadBot_Application.Models
+namespace Squad.Bot.Models
 {
     public class Config
     {

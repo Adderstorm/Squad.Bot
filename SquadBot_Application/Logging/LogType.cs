@@ -1,4 +1,4 @@
-﻿namespace SquadBot_Application.Logging
+﻿namespace Squad.Bot.Logging
 {
     public enum LogType
     {

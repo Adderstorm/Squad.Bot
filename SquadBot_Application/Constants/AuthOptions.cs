@@ -1,7 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace SquadBot_Application.Constants
+namespace Squad.Bot.Constants
 {
     public class AuthOptions
     {

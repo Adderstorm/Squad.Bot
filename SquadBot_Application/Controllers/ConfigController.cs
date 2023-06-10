@@ -1,12 +1,12 @@
 ﻿using Discord;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SquadBot_Application.Logging;
-using SquadBot_Application.Models;
-using SquadBot_Application.Services;
+using Squad.Bot.Logging;
+using Squad.Bot.Models;
+using Squad.Bot.Services;
 using System;
 
-namespace SquadBot_Application.Controllers
+namespace Squad.Bot.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]

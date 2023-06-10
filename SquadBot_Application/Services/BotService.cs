@@ -1,12 +1,12 @@
 ﻿using Discord;
-using SquadBot_Application.Bot.Utilities;
-using SquadBot_Application.Bot.Discord;
-using SquadBot_Application.Logging;
-using SquadBot_Application.Models;
-using SquadBot_Application.Bot.Data;
-using SquadBot_Application.Bot.Models.Bot_special;
+using Squad.Bot.DisBot.Utilities;
+using Squad.Bot.DisBot.Discord;
+using Squad.Bot.Logging;
+using Squad.Bot.Models;
+using Squad.Bot.DisBot.Data;
+using Squad.Bot.DisBot.Models.Bot_special;
 
-namespace SquadBot_Application.Services
+namespace Squad.Bot.Services
 {
     public class BotService
     {

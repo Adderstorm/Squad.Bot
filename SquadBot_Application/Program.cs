@@ -1,7 +1,7 @@
-using SquadBot_Application.Bot.Data;
-using SquadBot_Application.Constants;
+using Squad.Bot.DisBot.Data;
+using Squad.Bot.Constants;
 
-namespace SquadBot_Application
+namespace Squad.Bot
 {
     public class Program
     {

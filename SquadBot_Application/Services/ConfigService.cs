@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore.Query;
-using SquadBot_Application.Constants;
-using SquadBot_Application.Logging;
-using SquadBot_Application.Models;
+using Squad.Bot.Constants;
+using Squad.Bot.Logging;
+using Squad.Bot.Models;
 using System;
 using System.Text.Json;
 
-namespace SquadBot_Application.Services
+namespace Squad.Bot.Services
 {
     public class ConfigService : Config
     {

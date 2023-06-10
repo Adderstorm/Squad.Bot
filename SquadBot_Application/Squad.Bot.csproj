@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Bot\DsEvents\" />
+    <Folder Include="DisBot\DsEvents\" />
   </ItemGroup>
 
   <ItemGroup>

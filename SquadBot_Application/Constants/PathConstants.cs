@@ -1,4 +1,4 @@
-﻿namespace SquadBot_Application.Constants
+﻿namespace Squad.Bot.Constants
 {
     public static class PathConstants
     {

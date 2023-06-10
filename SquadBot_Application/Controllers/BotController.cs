@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SquadBot_Application.Logging;
-using SquadBot_Application.Services;
+using Squad.Bot.Logging;
+using Squad.Bot.Services;
 
-namespace SquadBot_Application.Controllers
+namespace Squad.Bot.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]

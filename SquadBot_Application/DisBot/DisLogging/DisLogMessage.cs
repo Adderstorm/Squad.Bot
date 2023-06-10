@@ -1,16 +1,14 @@
-﻿using Discord;
-
-namespace Squad.Bot.Logging
+﻿namespace Squad.Bot.DisBot.DisLogging
 {
-    public class LogMessage
+    public class DisLogMessage
     {
-        public LogMessage(LogType severity, string message, Exception? exception = null)
+        public DisLogMessage(DisLogType severity, string message, Exception? exception = null)
         {
             Severity = severity;
             Message = message;
             Exception = exception;
         }
-        public LogType Severity { get; }
+        public DisLogType Severity { get; }
         public string Message { get; }
         public Exception? Exception { get; }
         public bool HasException => Exception != null;
