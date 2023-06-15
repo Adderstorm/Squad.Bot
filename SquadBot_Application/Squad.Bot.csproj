@@ -24,10 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DisBot\DsEvents\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Update="Properties\config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

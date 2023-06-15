@@ -21,5 +21,8 @@ namespace Squad.Bot.DisBot.Models.Base
 
         [Column("totalMembersId")]
         public ICollection<TotalMembers> TotalMembers { get; set; } = null!;
+
+        [Column("addedAt")]
+        public DateTime AddedAt { get; set; } = DateTime.Now;
     }
 }

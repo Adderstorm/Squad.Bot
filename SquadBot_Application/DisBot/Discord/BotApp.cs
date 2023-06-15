@@ -5,6 +5,7 @@ using Discord.Interactions;
 using Microsoft.EntityFrameworkCore;
 using Squad.Bot.DisBot.Data;
 using Squad.Bot.DisBot.DisLogging;
+using Squad.Bot.DisBot.DsEvents;
 
 namespace Squad.Bot.DisBot.Discord
 {
@@ -63,6 +64,11 @@ namespace Squad.Bot.DisBot.Discord
 
                 await _services.GetRequiredService<InteractionHandler>()
                 .InitializeAsync();
+
+                _discordClient.UserLeft += UserGuildEvent.OnUserLeftGuild;
+                _discordClient.UserJoined += UserGuildEvent.OnUserJoinGuild;
+                _discordClient.MessageReceived += UserMessages.OnUserMessageReceived;
+                _discordClient.UserVoiceStateUpdated += OnUserStateChange.OnUserVoiceStateUpdate;
 
                 // Login and start bot
                 await _discordClient.LoginAsync(TokenType.Bot, _config.Token);
