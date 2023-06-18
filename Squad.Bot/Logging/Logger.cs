@@ -4,11 +4,11 @@
     {
         public static List<Task> LogTasks { get; set; } = new List<Task>();
         private static readonly object _lock = new();
-        public static void LogInfo(string message) => LogToConsole(new LogMessage(LogType.Info, message));
-        public static void LogWarning(string message) => LogToConsole(new LogMessage(LogType.Warning, message));
-        public static void LogError(string message, Exception? exception = null) => LogToConsole(new LogMessage(LogType.Error, message, exception));
-        public static void LogException(Exception exception, string? message = null) => LogToConsole(new LogMessage(LogType.Error, message ?? "No extra information.", exception));
-        public static void LogToConsole(LogMessage logMessage)
+        public static Task LogCommand(string message) => LogToConsole(new LogMessage(LogType.CommandExecuted, message));
+        public static Task LogException(Exception exception, string? message = null) => LogToConsole(new LogMessage(LogType.Exception, message ?? "No extra information.", exception));
+        public static Task LogEvent(string message) => LogToConsole(new LogMessage(LogType.EventRegistered, message));
+        public static Task LogInfo(string message) => LogToConsole(new LogMessage(LogType.Info, message));
+        public static Task LogToConsole(LogMessage logMessage)
         {
             // Fire and forget
             LogTasks.Add(Task.Run(() =>
@@ -27,6 +27,7 @@
                     LogTasks = LogTasks.Where(x => !x.IsCanceled && !x.IsCompleted && !x.IsCompletedSuccessfully && !x.IsFaulted).ToList();
                 }
             }));
+            return Task.CompletedTask;
         }
 
         private static void PrintSeverityPrefix(LogType severity)
@@ -36,9 +37,10 @@
             var oldColor = Console.ForegroundColor;
             var severityColor = severity switch
             {
-                LogType.Error => ConsoleColor.Red,
-                LogType.Warning => ConsoleColor.DarkYellow,
-                LogType.Info => ConsoleColor.DarkBlue,
+                LogType.Exception => ConsoleColor.Red,
+                LogType.CommandExecuted => ConsoleColor.DarkBlue,
+                LogType.EventRegistered => ConsoleColor.DarkBlue,
+                LogType.Info => ConsoleColor.DarkYellow,
                 _ => throw new NotImplementedException("That log type doesn't exist"),
             };
             Console.ForegroundColor = severityColor;

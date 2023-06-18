@@ -2,8 +2,9 @@
 {
     public enum LogType
     {
-        Error,
-        Warning,
+        CommandExecuted,
+        EventRegistered,
+        Exception,
         Info
     }
 }

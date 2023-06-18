@@ -1,22 +1,21 @@
 #See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+FROM mcr.microsoft.com/dotnet/runtime:7.0 AS base
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["SquadBot_Application/SquadBot_Application.csproj", "SquadBot_Application/"]
-RUN dotnet restore "SquadBot_Application/SquadBot_Application.csproj"
+COPY ["Squad.Bot/Squad.Bot.csproj", "Squad.Bot/"]
+RUN dotnet restore "Squad.Bot/Squad.Bot.csproj"
 COPY . .
-WORKDIR "/src/SquadBot_Application"
-RUN dotnet build "SquadBot_Application.csproj" -c Release -o /app/build
+WORKDIR "/src/Squad.Bot"
+RUN dotnet build "Squad.Bot.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "SquadBot_Application.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Squad.Bot.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
+ADD Squad.Bot/appsettings.json /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "SquadBot_Application.dll"]
+ENTRYPOINT ["dotnet", "Squad.Bot.dll"]

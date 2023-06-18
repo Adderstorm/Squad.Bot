@@ -1,6 +1,4 @@
-﻿using Discord;
-
-namespace Squad.Bot.Logging
+﻿namespace Squad.Bot.Logging
 {
     public class LogMessage
     {

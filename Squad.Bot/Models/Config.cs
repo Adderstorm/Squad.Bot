@@ -1,14 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Squad.Bot.Models
 {
-    public class Config
+    internal class Config
     {
-        [JsonProperty(nameof(Token), NullValueHandling = NullValueHandling.Ignore)]
-        public string? Token { get; set; }
-        [JsonProperty(nameof(TotalShards), NullValueHandling = NullValueHandling.Ignore)]
-        public int? TotalShards { get; set; }
-        [JsonProperty(nameof(DbOptions), NullValueHandling = NullValueHandling.Ignore)]
-        public string? DbOptions { get; set; }
     }
 }
