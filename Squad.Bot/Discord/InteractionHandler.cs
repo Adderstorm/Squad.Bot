@@ -44,7 +44,7 @@ namespace Squad.Bot.Discord
             _client.UserJoined += UserGuildEvent.OnUserJoinGuild;
 
             // Process the command execution results 
-            _handler.SlashCommandExecuted += SlashCommandExecuted;
+            _handler.InteractionExecuted += InteractionExecuted;
         }
 
         private async Task Log(LogMessage message) => Console.WriteLine(message);
@@ -53,13 +53,13 @@ namespace Squad.Bot.Discord
             // Context & Slash commands can be automatically registered, but this process needs to happen after the client enters the READY state.
             // Since Global Commands take around 1 hour to register, we should use a test guild to instantly update and test our commands.
 #if DEBUG
-            //await _handler.RegisterCommandsToGuildAsync(Convert.ToUInt64(_configuration["BotSettings:testGuild"]), true);
+            await _handler.RegisterCommandsToGuildAsync(Convert.ToUInt64(_configuration["BotSettings:testGuild"]), true);
 #else            
-            //await _handler.RegisterCommandsGloballyAsync(true);
+            await _handler.RegisterCommandsGloballyAsync(true);
 #endif
         }
 
-        private Task SlashCommandExecuted(SlashCommandInfo arg1, IInteractionContext arg2, IResult arg3)
+        private Task InteractionExecuted(ICommandInfo arg1, IInteractionContext arg2, IResult arg3)
         {
             return Task.CompletedTask;
         }
@@ -71,9 +71,12 @@ namespace Squad.Bot.Discord
                 var ctx = new SocketInteractionContext(_client, arg);
                 await _handler.ExecuteCommandAsync(ctx, _services);
             }
-            catch (Exception ex)
+            catch (Exception? ex)
             {
-                Console.WriteLine(ex);
+                await Logger.LogException(ex);
+#pragma warning disable CS8604 // Возможно, аргумент-ссылка, допускающий значение NULL.
+                Console.WriteLine(ex.StackTrace, ex.Source);
+#pragma warning restore CS8604 // Возможно, аргумент-ссылка, допускающий значение NULL.
 
                 // If a Slash Command execution fails it is most likely that the original interaction acknowledgement will persist. It is a good idea to delete the original
                 // response, or at least let the user know that something went wrong during the command execution.

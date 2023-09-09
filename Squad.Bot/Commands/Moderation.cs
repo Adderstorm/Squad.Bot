@@ -7,8 +7,9 @@ namespace Squad.Bot.Commands
     [Group("moderation", "commands for moderators")]
     public class Moderation : InteractionModuleBase<SocketInteractionContext>
     {
-        [EnabledInDm(false)]
+        [SlashCommand("kick", "kick user")]
         [DefaultMemberPermissions(GuildPermission.KickMembers)]
+        [EnabledInDm(false)]
         public async Task Kick(IUser user, string Reason)
         {
             var member = Context.Guild.GetUser(user.Id);
@@ -44,8 +45,9 @@ namespace Squad.Bot.Commands
                     }
                     catch { /*Couldn't send a message in the private messages of the user*/}
                 }
-                catch
+                catch (Exception ex)
                 {
+                    await Logger.LogException(ex);
                     var embed = new EmbedBuilder
                     {
                         Title = "Error!",
@@ -57,7 +59,9 @@ namespace Squad.Bot.Commands
                 }
             }
         }
+        [SlashCommand("nick", "changes nick")]
         [DefaultMemberPermissions(GuildPermission.ManageNicknames)]
+        [EnabledInDm(false)]
         public async Task Nick(IUser user, string nickname)
         {
             await Logger.LogCommand($"{nameof(Nick)} has executed by {Context.User.Username} in {Context.Channel.Id}");
@@ -73,11 +77,12 @@ namespace Squad.Bot.Commands
                 await Logger.LogInfo("Changing nick");
                 await member.ModifyAsync(x => x.Nickname = nickname);
                 await Logger.LogInfo("Responding embed");
-                await RespondAsync(embed: embed);
+                await RespondAsync(embed: embed,options:new RequestOptions() { Timeout=35000});
                 await Logger.LogInfo("nick has changed");
             }
-            catch
+            catch(Exception ex)
             {
+                await Logger.LogException(ex);
                 var embed = new EmbedBuilder
                 {
                     Title = "Error!",
@@ -87,9 +92,10 @@ namespace Squad.Bot.Commands
                 await RespondAsync(embed: embed);
             }
         }
+        [SlashCommand("ban", "ban user")]
         [DefaultMemberPermissions(GuildPermission.BanMembers)]
         [EnabledInDm(false)]
-        public async Task Ban(IUser user, string Reason)
+        public async Task Ban(IUser user, string Reason, bool notify = true)
         {
             var member = Context.Guild.GetUser(user.Id);
             if (member.GuildPermissions.Administrator)
@@ -117,12 +123,14 @@ namespace Squad.Bot.Commands
                     await RespondAsync(embed: embed);
                     try
                     {
-                        await member.SendMessageAsync($"You were banned by **{Context.User.Username}**!\nReason: {Reason}");
+                        if(notify)
+                            await member.SendMessageAsync($"You were banned by **{Context.User.Username}**!\nReason: {Reason}");
                     }
                     catch { /*Couldn't send a message in the private messages of the user*/}
                 }
-                catch
+                catch (Exception ex)
                 {
+                    await Logger.LogException(ex);
                     var embed = new EmbedBuilder
                     {
                         Title = "Error!",
@@ -133,10 +141,36 @@ namespace Squad.Bot.Commands
                 }
             }
         }
+        [SlashCommand("purge", "The amount of messages that should be deleted.")]
         [DefaultMemberPermissions(GuildPermission.ManageMessages)]
+        [RequireBotPermission(GuildPermission.ManageMessages)]
         [EnabledInDm(false)]
-        public async Task Purge(int amount = 0)
+        public async Task Purge(short amount = 0)
         {
+            Embed embed;
+            if (amount >= 100)
+            {
+                embed = new EmbedBuilder
+                {
+                    Title = "Error!",
+                    Description = "I can't delete more than 100 messages",
+                    Color = 0xE02B2B
+                }.Build();
+                await RespondAsync(embed: embed);
+                return;
+            }
+
+            var messages = Context.Channel.GetMessagesAsync(limit: amount).Flatten();
+
+            embed = new EmbedBuilder
+            {
+                Description = $"{Context.User} cleared {amount} messages!",
+                Color = 0x9C84EF
+            }.Build();
+            await RespondAsync(embed: embed, ephemeral: true);
+
+            await foreach(var message in messages)
+                await Context.Channel.DeleteMessageAsync(message.Id);
         }
     }
 }
