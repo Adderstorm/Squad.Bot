@@ -12,7 +12,7 @@ namespace Squad.Bot.Data
 
         public DbSet<BlackList> BlackList { get; set; }
         public DbSet<PrivateRooms> PrivateRooms { get; set; }
-        public DbSet<Servers> Servers { get; set; }
+        public DbSet<Guilds> Guilds { get; set; }
         public DbSet<Users> Users { get; set; }
         public DbSet<Warns> Warns { get; set; }
         public DbSet<JoinDate> JoinDate { get; set; }

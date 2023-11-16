@@ -10,7 +10,7 @@ namespace Squad.Bot.Models.Base
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Required(ErrorMessage = "Field User.ID must contain userID")]
         [Column("id")]
-        public int Id { get; set; }
+        public ulong Id { get; set; }
 
         [Column("nick")]
         [Required]

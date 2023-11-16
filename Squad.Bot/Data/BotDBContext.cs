@@ -7,6 +7,6 @@ namespace Squad.Bot.Data
     {
         public BotDBContext(DbContextOptions<BotDBContext> options) : base(options) { }
 
-        public DbSet<ServersToLogData> ServersToLogData { get; set;}
+        public DbSet<ServersToLogData> ServersToLogData { get; set; }
     }
 }

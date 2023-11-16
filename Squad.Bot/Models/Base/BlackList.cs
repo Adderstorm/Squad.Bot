@@ -17,7 +17,7 @@ namespace Squad.Bot.Models.Base
 
         [Required]
         [Column("serverId")]
-        public Servers Server { get; set; } = null!;
+        public Guilds Guilds { get; set; } = null!;
 
         [Column("reason")]
         [Required(ErrorMessage = "You must to specify a reason")]

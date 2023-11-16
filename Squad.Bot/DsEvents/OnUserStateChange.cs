@@ -14,12 +14,12 @@ namespace Squad.Bot.DsEvents
 
         private static async Task CollectData(SocketUser user, SocketVoiceState newState)
         {
-            
+            await Logger.LogInfo($"{user}, {newState}");
         }
 
         private static async Task PrivateRooms(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)
         {
-            
+            await Logger.LogInfo($"{user}, {newState}, {oldState}");
         }
     }
 }

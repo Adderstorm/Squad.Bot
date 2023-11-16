@@ -10,6 +10,6 @@ namespace Squad.Bot.Models.Bot_special
         public int Id { get; set; }
         [Required]
         [Column("serverId")]
-        public long ServerID { get; set; }
+        public ulong ServerID { get; set; }
     }
 }

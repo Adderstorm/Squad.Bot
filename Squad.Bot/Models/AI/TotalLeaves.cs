@@ -18,7 +18,7 @@ namespace Squad.Bot.Models.AI
 
         [Column("serverId")]
         [Required]
-        public Servers Server { get; set; } = null!;
+        public Guilds Guilds { get; set; } = null!;
 
         [Column("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;

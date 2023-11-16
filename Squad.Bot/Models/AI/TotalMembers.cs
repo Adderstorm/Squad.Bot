@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Squad.Bot.Models.Base;
 using System.ComponentModel.DataAnnotations;
-using Squad.Bot.Models.Base;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Squad.Bot.Models.AI
 {
@@ -13,7 +13,7 @@ namespace Squad.Bot.Models.AI
         public int Id { get; set; }
 
         [Column("serverId")]
-        public Servers Server { get; set; } = null!;
+        public Guilds Guilds { get; set; } = null!;
 
         [Column("totalUsers")]
         [Required]

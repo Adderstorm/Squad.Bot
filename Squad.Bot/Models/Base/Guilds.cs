@@ -5,12 +5,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Squad.Bot.Models.Base
 {
     [Table("servers")]
-    public class Servers
+    public class Guilds
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")]
-        public long Id { get; set; }
+        public ulong Id { get; set; }
 
         [Column("serverName")]
         [Required(ErrorMessage = "Field serverName must contain the server name")]

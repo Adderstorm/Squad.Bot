@@ -9,6 +9,7 @@ namespace Squad.Bot.Commands
     {
         [SlashCommand("kick", "kick user")]
         [DefaultMemberPermissions(GuildPermission.KickMembers)]
+        [RequireBotPermission(GuildPermission.KickMembers)]
         [EnabledInDm(false)]
         public async Task Kick(IUser user, string Reason)
         {
@@ -21,7 +22,7 @@ namespace Squad.Bot.Commands
                     Description = "User has Admin permissions.",
                     Color = 0xE02B2B
                 }.Build();
-                await RespondAsync("",embed: embed);
+                await RespondAsync("", embed: embed);
             }
             else
             {
@@ -61,6 +62,7 @@ namespace Squad.Bot.Commands
         }
         [SlashCommand("nick", "changes nick")]
         [DefaultMemberPermissions(GuildPermission.ManageNicknames)]
+        [RequireBotPermission(GuildPermission.ManageNicknames)]
         [EnabledInDm(false)]
         public async Task Nick(IUser user, string nickname)
         {
@@ -77,10 +79,10 @@ namespace Squad.Bot.Commands
                 await Logger.LogInfo("Changing nick");
                 await member.ModifyAsync(x => x.Nickname = nickname);
                 await Logger.LogInfo("Responding embed");
-                await RespondAsync(embed: embed,options:new RequestOptions() { Timeout=35000});
+                await RespondAsync(embed: embed, options: new RequestOptions() { Timeout = 35000 });
                 await Logger.LogInfo("nick has changed");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 await Logger.LogException(ex);
                 var embed = new EmbedBuilder
@@ -94,6 +96,7 @@ namespace Squad.Bot.Commands
         }
         [SlashCommand("ban", "ban user")]
         [DefaultMemberPermissions(GuildPermission.BanMembers)]
+        [RequireBotPermission(GuildPermission.BanMembers)]
         [EnabledInDm(false)]
         public async Task Ban(IUser user, string Reason, bool notify = true)
         {
@@ -123,7 +126,7 @@ namespace Squad.Bot.Commands
                     await RespondAsync(embed: embed);
                     try
                     {
-                        if(notify)
+                        if (notify)
                             await member.SendMessageAsync($"You were banned by **{Context.User.Username}**!\nReason: {Reason}");
                     }
                     catch { /*Couldn't send a message in the private messages of the user*/}
@@ -164,12 +167,13 @@ namespace Squad.Bot.Commands
 
             embed = new EmbedBuilder
             {
-                Description = $"{Context.User} cleared {amount} messages!",
+                Title = $"{Context.User} cleared {amount} messages!",
+                Description = "Don't wait till bot respond to you, it will take a few seconds",
                 Color = 0x9C84EF
             }.Build();
             await RespondAsync(embed: embed, ephemeral: true);
 
-            await foreach(var message in messages)
+            await foreach (var message in messages)
                 await Context.Channel.DeleteMessageAsync(message.Id);
         }
     }

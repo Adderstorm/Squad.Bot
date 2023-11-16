@@ -1,12 +1,11 @@
-﻿using Discord.Interactions;
+﻿using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
-using Discord;
-using System.Reflection;
-using IResult = Discord.Interactions.IResult;
 using Microsoft.Extensions.Configuration;
-using System.Reflection.Metadata;
 using Squad.Bot.DsEvents;
 using Squad.Bot.Logging;
+using System.Reflection;
+using IResult = Discord.Interactions.IResult;
 using LogMessage = Discord.LogMessage;
 
 namespace Squad.Bot.Discord
@@ -47,7 +46,13 @@ namespace Squad.Bot.Discord
             _handler.InteractionExecuted += InteractionExecuted;
         }
 
-        private async Task Log(LogMessage message) => Console.WriteLine(message);
+        private Task Log(LogMessage message)
+        {
+            Console.WriteLine(message);
+
+            return Task.CompletedTask;
+        }
+
         private async Task ReadyAsync()
         {
             // Context & Slash commands can be automatically registered, but this process needs to happen after the client enters the READY state.

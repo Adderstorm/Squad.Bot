@@ -13,12 +13,12 @@ namespace Squad.Bot.Models.Base
 
         [Required]
         [Column("serverId")]
-        public Servers Server { get; set; } = null!;
+        public Guilds Guilds { get; set; } = null!;
 
         [Column("categoryId")]
-        public int CategoryID { get; set; }
+        public ulong CategoryID { get; set; }
 
         [Column("channelId")]
-        public int ChannelID { get; set; }
+        public ulong ChannelID { get; set; }
     }
 }

@@ -14,7 +14,7 @@ namespace Squad.Bot.Models.AI
 
         [Column("serverId")]
         [Required]
-        public Servers Server { get; set; } = null!;
+        public Guilds Guilds { get; set; } = null!;
 
         [Column("totalMinutes")]
         [Required]
