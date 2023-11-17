@@ -9,7 +9,6 @@ namespace Squad.Bot.Models.Bot_special
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required]
-        [Column("serverId")]
         public ulong ServerID { get; set; }
     }
 }

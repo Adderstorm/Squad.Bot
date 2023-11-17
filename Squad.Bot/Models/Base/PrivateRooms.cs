@@ -8,17 +8,14 @@ namespace Squad.Bot.Models.Base
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Column("id")]
         public int Id { get; set; }
 
         [Required]
-        [Column("serverId")]
         public Guilds Guilds { get; set; } = null!;
 
-        [Column("categoryId")]
         public ulong CategoryID { get; set; }
 
-        [Column("channelId")]
         public ulong ChannelID { get; set; }
+        public ulong SettingsChannelID { get; set; }
     }
 }

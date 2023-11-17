@@ -9,20 +9,15 @@ namespace Squad.Bot.Models.Base
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Required(ErrorMessage = "Field User.ID must contain userID")]
-        [Column("id")]
         public ulong Id { get; set; }
 
-        [Column("nick")]
         [Required]
         public string Nick { get; set; } = string.Empty;
 
-        [Column("XP")]
         public float XP { get; set; } = 0f;
 
-        [Column("warnsId")]
         public ICollection<Warns> Warns { get; set; } = null!;
 
-        [Column("blacklistId")]
         public ICollection<BlackList> BlackList { get; set; } = null!;
     }
 }

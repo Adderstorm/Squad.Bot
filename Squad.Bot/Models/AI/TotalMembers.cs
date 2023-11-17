@@ -9,17 +9,13 @@ namespace Squad.Bot.Models.AI
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        [Column("id")]
         public int Id { get; set; }
 
-        [Column("serverId")]
         public Guilds Guilds { get; set; } = null!;
 
-        [Column("totalUsers")]
         [Required]
         public int TotalUsers { get; set; }
 
-        [Column("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }
