@@ -3,11 +3,6 @@ using Discord.Interactions;
 using Microsoft.EntityFrameworkCore;
 using Squad.Bot.Data;
 using Squad.Bot.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Squad.Bot.ComponentsInteraction
 {
@@ -33,7 +28,7 @@ namespace Squad.Bot.ComponentsInteraction
 
             await _dbContext.SaveChangesAsync();
 
-            //TODO: Понять как удалить существующие каналы
+            //TODO: Понять как удалить существующие каналы на серваке дискорда
         }
 
         [ComponentInteraction("portal:rename")]

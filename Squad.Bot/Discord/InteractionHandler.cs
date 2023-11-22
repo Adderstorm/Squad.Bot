@@ -2,7 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
-using Squad.Bot.DsEvents;
+using Squad.Bot.Events;
 using Squad.Bot.Logging;
 using System.Reflection;
 using IResult = Discord.Interactions.IResult;

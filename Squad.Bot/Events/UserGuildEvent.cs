@@ -1,7 +1,7 @@
 ﻿using Discord.WebSocket;
 using Squad.Bot.Logging;
 
-namespace Squad.Bot.DsEvents
+namespace Squad.Bot.Events
 {
     public class UserGuildEvent
     {
