@@ -2,6 +2,8 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Squad.Bot.Data;
 using Squad.Bot.Events;
 using Squad.Bot.Logging;
 using System.Reflection;
@@ -28,6 +30,12 @@ namespace Squad.Bot.Discord
 
         public async Task InitializeAsync()
         {
+            // Initialize the handler and services for communication with the server
+
+            UserGuildEvent userGuildEvent = new UserGuildEvent(_services.GetRequiredService<SquadDBContext>());
+            UserMessages userMessages = new UserMessages(_services.GetRequiredService<SquadDBContext>());
+            OnUserStateChange userStateChange = new OnUserStateChange(_services.GetRequiredService<SquadDBContext>());
+
             // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService
             await _handler.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
 
@@ -36,11 +44,11 @@ namespace Squad.Bot.Discord
             _client.Log += Log;
             _client.Ready += ReadyAsync;
 
-            //Subscribes for events
-            _client.MessageReceived += UserMessages.OnUserMessageReceived;
-            _client.UserVoiceStateUpdated += OnUserStateChange.OnUserVoiceStateUpdate;
-            _client.UserLeft += UserGuildEvent.OnUserLeftGuild;
-            _client.UserJoined += UserGuildEvent.OnUserJoinGuild;
+            // Subscribes for events
+            _client.MessageReceived += userMessages.OnUserMessageReceived;
+            _client.UserVoiceStateUpdated += userStateChange.OnUserVoiceStateUpdate;
+            _client.UserLeft += userGuildEvent.OnUserLeftGuild;
+            _client.UserJoined += userGuildEvent.OnUserJoinGuild;
 
             // Process the command execution results 
             _handler.InteractionExecuted += InteractionExecuted;
