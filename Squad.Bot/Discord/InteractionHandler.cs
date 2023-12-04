@@ -12,6 +12,11 @@ using LogMessage = Discord.LogMessage;
 
 namespace Squad.Bot.Discord
 {
+    /// <summary>
+    /// This class is responsible for handling interactions with the Discord server.
+    /// It uses the InteractionService to register modules that contain commands,
+    /// and the DiscordSocketClient to listen for interactions.
+    /// </summary>
     public class InteractionHandler
     {
         private readonly DiscordSocketClient _client;
@@ -19,7 +24,13 @@ namespace Squad.Bot.Discord
         private readonly IServiceProvider _services;
         private readonly IConfiguration _configuration;
 
-        // Using constructor injection
+        /// <summary>
+        /// Constructs a new instance of the InteractionHandler class.
+        /// </summary>
+        /// <param name="client">The DiscordSocketClient used to listen for interactions.</param>
+        /// <param name="handler">The InteractionService used to register modules.</param>
+        /// <param name="services">The service provider used to resolve dependencies.</param>
+        /// <param name="configuration">The configuration used to read bot settings.</param>
         public InteractionHandler(DiscordSocketClient client, InteractionService handler, IServiceProvider services, IConfiguration configuration)
         {
             _client = client;
@@ -28,6 +39,9 @@ namespace Squad.Bot.Discord
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Initializes the InteractionHandler by registering modules and subscribing to events.
+        /// </summary>
         public async Task InitializeAsync()
         {
             // Initialize the handler and services for communication with the server
@@ -76,6 +90,7 @@ namespace Squad.Bot.Discord
         {
             return Task.CompletedTask;
         }
+
         private async Task HandleInteraction(SocketInteraction arg)
         {
             try
@@ -87,9 +102,9 @@ namespace Squad.Bot.Discord
             catch (Exception? ex)
             {
                 await Logger.LogException(ex);
-#pragma warning disable CS8604 // Возможно, аргумент-ссылка, допускающий значение NULL.
+#pragma warning disable CS8604 // Possible null reference argument.
                 Console.WriteLine(ex.StackTrace, ex.Source);
-#pragma warning restore CS8604 // Возможно, аргумент-ссылка, допускающий значение NULL.
+#pragma warning restore CS8604 // Possible null reference argument.
 
                 // If a Slash Command execution fails it is most likely that the original interaction acknowledgement will persist. It is a good idea to delete the original
                 // response, or at least let the user know that something went wrong during the command execution.
