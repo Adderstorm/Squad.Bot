@@ -2,7 +2,7 @@
 {
     internal class Program
     {
-        static void Main() => new Startup().Initialize().GetAwaiter().GetResult();
+        static void Main() => new Startup().InitializeAsync().GetAwaiter().GetResult();
 
     }
 }
