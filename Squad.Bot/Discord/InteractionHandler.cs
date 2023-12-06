@@ -46,9 +46,9 @@ namespace Squad.Bot.Discord
         {
             // Initialize the handler and services for communication with the server
 
-            UserGuildEvent userGuildEvent = new UserGuildEvent(_services.GetRequiredService<SquadDBContext>());
-            UserMessages userMessages = new UserMessages(_services.GetRequiredService<SquadDBContext>());
-            OnUserStateChange userStateChange = new OnUserStateChange(_services.GetRequiredService<SquadDBContext>());
+            UserGuildEvent userGuildEvent = new (_services.GetRequiredService<SquadDBContext>());
+            UserMessages userMessages = new (_services.GetRequiredService<SquadDBContext>());
+            OnUserStateChange userStateChange = new (_services.GetRequiredService<SquadDBContext>());
 
             // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService
             await _handler.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
@@ -101,7 +101,7 @@ namespace Squad.Bot.Discord
             }
             catch (Exception? ex)
             {
-                await Logger.LogException(ex);
+                await Logger.LogException(ex, ex.Message);
 #pragma warning disable CS8604 // Possible null reference argument.
                 Console.WriteLine(ex.StackTrace, ex.Source);
 #pragma warning restore CS8604 // Possible null reference argument.
