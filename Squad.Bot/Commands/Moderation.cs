@@ -4,9 +4,24 @@ using Squad.Bot.Logging;
 
 namespace Squad.Bot.Commands
 {
+    /// <summary>
+    /// A class containing commands for moderation.
+    /// </summary>
     [Group("moderation", "commands for moderators")]
     public class Moderation : InteractionModuleBase<SocketInteractionContext>
     {
+        /// <summary>
+        /// Kicks a user from the server.
+        /// </summary>
+        /// <param name="user">The user to kick.</param>
+        /// <param name="reason">The reason for the kick.</param>
+        /// <remarks>
+        /// This command requires the <c>Kick Members</c> permission in the server.
+        /// If the user has the <c>Administrator</c> permission, the command will fail.
+        /// </remarks>
+        /// <example>
+        /// !kick @JohnDoe Spamming
+        /// </example>
         [SlashCommand("kick", "kick user")]
         [DefaultMemberPermissions(GuildPermission.KickMembers)]
         [RequireBotPermission(GuildPermission.KickMembers)]
@@ -28,18 +43,15 @@ namespace Squad.Bot.Commands
             {
                 try
                 {
-                    Embed embed = new EmbedBuilder
+                    var embed = new EmbedBuilder
                     {
                         Title = "User Kicked!",
                         Description = $"**{member}** was kicked by **{Context.User.Username}**!",
                         Color = 0x9C84EF
-                    }.AddField("Reason:", Reason)
-                    .Build();
-                    await Logger.LogInfo("Kicking");
+                    }.AddField("Reason:", Reason);
+
                     await member.KickAsync(Reason);
-                    await Logger.LogInfo("responding");
-                    await RespondAsync("", embed: embed);
-                    await Logger.LogInfo("Responded");
+                    await RespondAsync("", embed: embed.Build());
                     try
                     {
                         await member.SendMessageAsync($"You were kicked by **{Context.User.Username}**!\nReason: {Reason}");
@@ -54,19 +66,32 @@ namespace Squad.Bot.Commands
                         Title = "Error!",
                         Description = "An error occurred while trying to kick the user. Make sure my role is above the role of the user you want to kick.",
                         Color = 0xE02B2B
-                    }.Build();
+                    };
 
-                    await RespondAsync("", embed: embed);
+                    await RespondAsync("", embed: embed.Build());
                 }
             }
         }
+
+        /// <summary>
+        /// Changes the nickname of a user in the server.
+        /// </summary>
+        /// <param name="user">The user to change the nickname of.</param>
+        /// <param name="nickname">The new nickname for the user.</param>
+        /// <remarks>
+        /// This command requires the <c>Manage Nicknames</c> permission in the server.
+        /// If the user has the <c>Administrator</c> permission, the command will fail.
+        /// </remarks>
+        /// <example>
+        /// !nick @JohnDoe John
+        /// </example>
         [SlashCommand("nick", "changes nick")]
         [DefaultMemberPermissions(GuildPermission.ManageNicknames)]
         [RequireBotPermission(GuildPermission.ManageNicknames)]
         [EnabledInDm(false)]
         public async Task Nick(IUser user, string nickname)
         {
-            await Logger.LogCommand($"{nameof(Nick)} has executed by {Context.User.Username} in {Context.Channel.Id}");
+
             var member = Context.Guild.GetUser(user.Id);
             try
             {
@@ -76,11 +101,9 @@ namespace Squad.Bot.Commands
                     Description = $"**{member.Nickname}'s** new nickname is **{nickname}**!",
                     Color = 0x9C84EF
                 }.Build();
-                await Logger.LogInfo("Changing nick");
+
                 await member.ModifyAsync(x => x.Nickname = nickname);
-                await Logger.LogInfo("Responding embed");
                 await RespondAsync(embed: embed, options: new RequestOptions() { Timeout = 35000 });
-                await Logger.LogInfo("nick has changed");
             }
             catch (Exception ex)
             {
@@ -90,15 +113,29 @@ namespace Squad.Bot.Commands
                     Title = "Error!",
                     Description = "An error occurred while trying to change the nickname of the user. Make sure my role is above the role of the user you want to change the nickname.",
                     Color = 0xE02B2B
-                }.Build();
-                await RespondAsync(embed: embed);
+                };
+                await RespondAsync(embed: embed.Build());
             }
         }
+
+        /// <summary>
+        /// Bans a user from the server.
+        /// </summary>
+        /// <param name="user">The user to ban.</param>
+        /// <param name="reason">The reason for the ban.</param>
+        /// <param name="notify">Whether to notify the user.</param>
+        /// <remarks>
+        /// This command requires the <c>Ban Members</c> permission in the server.
+        /// If the user has the <c>Administrator</c> permission, the command will fail.
+        /// </remarks>
+        /// <example>
+        /// !ban @JohnDoe Spamming true
+        /// </example>
         [SlashCommand("ban", "ban user")]
         [DefaultMemberPermissions(GuildPermission.BanMembers)]
         [RequireBotPermission(GuildPermission.BanMembers)]
         [EnabledInDm(false)]
-        public async Task Ban(IUser user, string Reason, bool notify = true)
+        public async Task Ban(IUser user, string reason, bool notify = true)
         {
             var member = Context.Guild.GetUser(user.Id);
             if (member.GuildPermissions.Administrator)
@@ -120,14 +157,14 @@ namespace Squad.Bot.Commands
                         Title = "User Banned!",
                         Description = $"**{member}** was banned by **{Context.User.Username}**!",
                         Color = 0x9C84EF
-                    }.AddField("Reason:", Reason)
+                    }.AddField("Reason:", reason)
                     .Build();
-                    await Context.Guild.AddBanAsync(user, reason: Reason);
+                    await Context.Guild.AddBanAsync(user, reason: reason);
                     await RespondAsync(embed: embed);
                     try
                     {
                         if (notify)
-                            await member.SendMessageAsync($"You were banned by **{Context.User.Username}**!\nReason: {Reason}");
+                            await member.SendMessageAsync($"You were banned by **{Context.User.Username}**!\nReason: {reason}");
                     }
                     catch { /*Couldn't send a message in the private messages of the user*/}
                 }
@@ -144,12 +181,25 @@ namespace Squad.Bot.Commands
                 }
             }
         }
+
+        /// <summary>
+        /// Deletes a specified number of messages from the current channel.
+        /// </summary>
+        /// <param name="amount">The number of messages to delete.</param>
+        /// <remarks>
+        /// This command requires the <c>Manage Messages</c> permission in the server.
+        /// If the user has the <c>Administrator</c> permission, the command will fail.
+        /// </remarks>
+        /// <example>
+        /// !purge 10
+        /// </example>
         [SlashCommand("purge", "The amount of messages that should be deleted.")]
         [DefaultMemberPermissions(GuildPermission.ManageMessages)]
         [RequireBotPermission(GuildPermission.ManageMessages)]
         [EnabledInDm(false)]
         public async Task Purge(short amount = 0)
         {
+            SocketInteractionContext ctx = new SocketInteractionContext(Context.Client, Context.Interaction);
             Embed embed;
             if (amount >= 100)
             {
@@ -174,7 +224,7 @@ namespace Squad.Bot.Commands
             await RespondAsync(embed: embed, ephemeral: true);
 
             await foreach (var message in messages)
-                await Context.Channel.DeleteMessageAsync(message.Id);
+                await ctx.Channel.DeleteMessageAsync(message.Id);
         }
     }
 }
