@@ -6,16 +6,10 @@ using Squad.Bot.Logging;
 
 namespace Squad.Bot.ComponentsInteraction
 {
-    public class PrivateRoomsComponents : InteractionModuleBase<SocketInteractionContext>
+    public class PrivateRoomsComponents(SquadDBContext dbContext) : InteractionModuleBase<SocketInteractionContext>
     {
 
-        private readonly SquadDBContext _dbContext;
-
-        public PrivateRoomsComponents(SquadDBContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
-
+        private readonly SquadDBContext _dbContext = dbContext;
 
         [ComponentInteraction("portal:delete")]
         public async Task Delete()
@@ -28,7 +22,23 @@ namespace Squad.Bot.ComponentsInteraction
 
             await _dbContext.SaveChangesAsync();
 
-            //TODO: Понять как удалить существующие каналы на серваке дискорда
+            
+            // Get the category, voice, and text channels associated with the private room
+            var categoryChannel = Context.Guild.GetCategoryChannel(savedPortal.CategoryID);
+            var voiceChannel = Context.Guild.GetVoiceChannel(savedPortal.ChannelID);
+            var settingsChannel = Context.Guild.GetTextChannel(savedPortal.SettingsChannelID);
+
+            // Delete the category, voice, and text channels
+            await categoryChannel.DeleteAsync();
+            await voiceChannel.DeleteAsync();
+            await settingsChannel.DeleteAsync();
+
+            var embed = new EmbedBuilder()
+                .WithAuthor(Context.User.Username)
+                .WithColor(0x9C84EF)
+                .WithDescription("Portals was successfully deleted");
+
+            await ModifyOriginalResponseAsync(x => { x.Content = null; x.Embed = embed.Build(); });
         }
 
         [ComponentInteraction("portal:rename")]

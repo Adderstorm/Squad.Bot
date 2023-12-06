@@ -1,8 +1,11 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Squad.Bot.Data;
 using Squad.Bot.Logging;
+using Squad.Bot.Utilities;
+using System.Threading.Tasks;
 
 namespace Squad.Bot.Commands
 {
@@ -52,17 +55,23 @@ namespace Squad.Bot.Commands
             }
             else
             {
+                var overwrites = new PermissionOverwriteHelper(Context.Guild.Roles.First(x => x.Name == "@everyone").Id, PermissionTarget.Role)
+                {
+                    Permissions = PermissionOverwriteHelper.SetOverwritePermissions()
+                };
+
                 var category = await Context.Guild.CreateCategoryChannelAsync(categoryName);
 
-                //TODO: Понять как поменять права голосовых каналов
                 var voiceChannel = await Context.Guild.CreateVoiceChannelAsync(voiceChannelName, tcp => {
                                                                                                             tcp.CategoryId = category.Id;
+                                                                                                            tcp.PermissionOverwrites = overwrites.CreateOverwrites();
                                                                                                         });
 
                 var textChannel = await Context.Guild.CreateTextChannelAsync(settingsChannelName, tcp => {
                                                                                                             tcp.CategoryId = category.Id;
                                                                                                             tcp.Topic = "manage private rooms";
-                                                                                                         });
+                                                                                                            tcp.PermissionOverwrites = overwrites.CreateOverwrites();
+                                                                                                        });
 
                 //Buttons
                 var rename = new ButtonBuilder().WithCustomId("portal:rename").WithLabel("✏️").WithStyle(ButtonStyle.Secondary);
