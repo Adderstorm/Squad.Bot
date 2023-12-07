@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Squad.Bot.Logging;
+using Squad.Bot.Utilities;
 
 namespace Squad.Bot.Commands
 {
@@ -35,7 +36,7 @@ namespace Squad.Bot.Commands
                 {
                     Title = "Error!",
                     Description = "User has Admin permissions.",
-                    Color = 0xE02B2B
+                    Color = CustomColors.Failure,
                 }.Build();
                 await RespondAsync("", embed: embed);
             }
@@ -47,7 +48,7 @@ namespace Squad.Bot.Commands
                     {
                         Title = "User Kicked!",
                         Description = $"**{member}** was kicked by **{Context.User.Username}**!",
-                        Color = 0x9C84EF
+                        Color = CustomColors.Success,
                     }.AddField("Reason:", Reason);
 
                     await member.KickAsync(Reason);
@@ -65,7 +66,7 @@ namespace Squad.Bot.Commands
                     {
                         Title = "Error!",
                         Description = "An error occurred while trying to kick the user. Make sure my role is above the role of the user you want to kick.",
-                        Color = 0xE02B2B
+                        Color = CustomColors.Failure,
                     };
 
                     await RespondAsync("", embed: embed.Build());
@@ -99,7 +100,7 @@ namespace Squad.Bot.Commands
                 {
                     Title = "Changed Nickname!",
                     Description = $"**{member.Nickname}'s** new nickname is **{nickname}**!",
-                    Color = 0x9C84EF
+                    Color = CustomColors.Success
                 }.Build();
 
                 await member.ModifyAsync(x => x.Nickname = nickname);
@@ -112,7 +113,7 @@ namespace Squad.Bot.Commands
                 {
                     Title = "Error!",
                     Description = "An error occurred while trying to change the nickname of the user. Make sure my role is above the role of the user you want to change the nickname.",
-                    Color = 0xE02B2B
+                    Color = CustomColors.Failure
                 };
                 await RespondAsync(embed: embed.Build());
             }
@@ -144,7 +145,7 @@ namespace Squad.Bot.Commands
                 {
                     Title = "Error!",
                     Description = "User has Admin permissions.",
-                    Color = 0xE02B2B
+                    Color = CustomColors.Failure
                 }.Build();
                 await RespondAsync("", embed: embed);
             }
@@ -156,7 +157,7 @@ namespace Squad.Bot.Commands
                     {
                         Title = "User Banned!",
                         Description = $"**{member}** was banned by **{Context.User.Username}**!",
-                        Color = 0x9C84EF
+                        Color = CustomColors.Success
                     }.AddField("Reason:", reason)
                     .Build();
                     await Context.Guild.AddBanAsync(user, reason: reason);
@@ -175,7 +176,7 @@ namespace Squad.Bot.Commands
                     {
                         Title = "Error!",
                         Description = "An error occurred while trying to ban the user. Make sure my role is above the role of the user you want to ban.",
-                        Color = 0xE02B2B
+                        Color = CustomColors.Failure
                     }.Build();
                     await RespondAsync(embed: embed);
                 }
@@ -199,7 +200,7 @@ namespace Squad.Bot.Commands
         [EnabledInDm(false)]
         public async Task Purge(short amount = 0)
         {
-            SocketInteractionContext ctx = new SocketInteractionContext(Context.Client, Context.Interaction);
+            SocketInteractionContext ctx = new(Context.Client, Context.Interaction);
             Embed embed;
             if (amount >= 100)
             {
@@ -207,7 +208,7 @@ namespace Squad.Bot.Commands
                 {
                     Title = "Error!",
                     Description = "I can't delete more than 100 messages",
-                    Color = 0xE02B2B
+                    Color = CustomColors.Failure
                 }.Build();
                 await RespondAsync(embed: embed);
                 return;
@@ -219,7 +220,7 @@ namespace Squad.Bot.Commands
             {
                 Title = $"{Context.User} cleared {amount} messages!",
                 Description = "Don't wait till bot respond to you, it will take a few seconds",
-                Color = 0x9C84EF
+                Color = CustomColors.Success
             }.Build();
             await RespondAsync(embed: embed, ephemeral: true);
 
