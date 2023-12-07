@@ -14,6 +14,7 @@ namespace Squad.Bot.Events
             _dbContext = dbContext;
         }
 
+        // TODO: Change the stubs with the working code
         public async Task OnUserMessageReceived(SocketMessage message)
         {
             await Logger.LogEvent($"{nameof(OnUserMessageReceived)} has been executed by {message.Author.Username}:{message.Author.Id} in {message.Channel.Id} channel");

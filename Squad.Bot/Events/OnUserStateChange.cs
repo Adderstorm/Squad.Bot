@@ -22,7 +22,8 @@ namespace Squad.Bot.Events
             await CollectData(user, oldState, newState);
         }
 
-        private async Task CollectData(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)
+        // TODO: Change the stubs with the working code and !!! delete static field in CollectData
+        private static async Task CollectData(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)
         {
             await Logger.LogInfo($"{user}, {newState}, {oldState}");
         }

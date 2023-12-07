@@ -14,6 +14,8 @@ namespace Squad.Bot.Events
         {
             _dbContext = dbContext;
         }
+
+        // TODO: Change the stubs with the working code
         public async Task OnUserLeftGuild(SocketGuild guild, SocketUser user)
         {
             await Logger.LogEvent($"{nameof(OnUserLeftGuild)} has been executed by {user.Username} in {guild.Id}");
