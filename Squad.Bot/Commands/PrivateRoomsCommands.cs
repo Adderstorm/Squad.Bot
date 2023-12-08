@@ -34,15 +34,14 @@ namespace Squad.Bot.Commands
         [DefaultMemberPermissions(GuildPermission.Administrator)]
         public async Task Invite(string voiceChannelName = "[➕] Create", string settingsChannelName = "[⚙️] Settings", string categoryName = "Portal")
         {
-            var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
             N:
+            var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
             if (savedPortal?.CategoryID != null && savedPortal?.ChannelID != null)
             {
                 if(Context.Guild.GetCategoryChannel(savedPortal.CategoryID) == null && Context.Guild.GetVoiceChannel(savedPortal.ChannelID) == null && Context.Guild.GetTextChannel(savedPortal.SettingsChannelID) == null)
                 {
                     _dbContext.PrivateRooms.Remove(savedPortal);
-                    await _dbContext.SaveChangesAsync();
                     // WARNING: goto may cause many problems in future
                     goto N;
                 }
@@ -58,30 +57,47 @@ namespace Squad.Bot.Commands
             }
             else
             {
-                // TODO: Specify the permissions overwrites
-                var overwrites = new PermissionOverwriteHelper(Context.Guild.Roles.First(x => x.Name == "@everyone").Id, PermissionTarget.Role)
+                ulong everyoneRoleId = Context.Guild.Roles.First(x => x.Name == "@everyone").Id;
+
+                // Permissions overwrites
+                var categoryOverwrites = new PermissionOverwriteHelper(everyoneRoleId, PermissionTarget.Role)
+                {
+                    Permissions = PermissionOverwriteHelper.SetOverwritePermissions(viewChannel: PermValue.Allow)
+                };
+                var voiceOverwrites = new PermissionOverwriteHelper(everyoneRoleId, PermissionTarget.Role)
+                {
+                    Permissions = PermissionOverwriteHelper.SetOverwritePermissions(connect: PermValue.Allow, speak: PermValue.Deny)
+                };
+                var settingsOverwrites = new PermissionOverwriteHelper(everyoneRoleId, PermissionTarget.Role)
                 {
                     Permissions = PermissionOverwriteHelper.SetOverwritePermissions()
                 };
 
-                var category = await Context.Guild.CreateCategoryChannelAsync(categoryName, tcp => { tcp.PermissionOverwrites = overwrites.CreateOverwrites(); });
+                var category = await Context.Guild.CreateCategoryChannelAsync(categoryName, tcp => { tcp.PermissionOverwrites = categoryOverwrites.CreateOverwrites(); });
 
                 var voiceChannel = await Context.Guild.CreateVoiceChannelAsync(voiceChannelName, tcp => {tcp.CategoryId = category.Id;
-                                                                                                         tcp.PermissionOverwrites = overwrites.CreateOverwrites();});
+                                                                                                         tcp.PermissionOverwrites = voiceOverwrites.CreateOverwrites();});
 
                 var settingsChannel = await Context.Guild.CreateTextChannelAsync(settingsChannelName, tcp => {tcp.CategoryId = category.Id;
                                                                                                           tcp.Topic = "manage private rooms";
-                                                                                                          tcp.PermissionOverwrites = overwrites.CreateOverwrites();});
+                                                                                                          tcp.PermissionOverwrites = settingsOverwrites.CreateOverwrites();});
+
+                await _dbContext.PrivateRooms.AddAsync(new Models.Base.PrivateRooms { CategoryID = category.Id, 
+                                                                                      ChannelID = voiceChannel.Id, 
+                                                                                      SettingsChannelID = settingsChannel.Id, 
+                                                                                      Guilds = savedPortal.Guilds });
+                await _dbContext.SaveChangesAsync();
 
                 //Buttons
-                var rename = new ButtonBuilder().WithCustomId("portal:rename").WithLabel("✏️").WithStyle(ButtonStyle.Secondary);
-                var hide = new ButtonBuilder().WithCustomId("portal:hide").WithLabel("🔒").WithStyle(ButtonStyle.Secondary);
-                var limit = new ButtonBuilder().WithCustomId("portal:limit").WithLabel("🫂").WithStyle(ButtonStyle.Secondary);
-                var kick = new ButtonBuilder().WithCustomId("portal:kick").WithLabel("🚫").WithStyle(ButtonStyle.Secondary);
-                var owner = new ButtonBuilder().WithCustomId("portal:owner").WithLabel("👤").WithStyle(ButtonStyle.Secondary);
+                var rename = new ButtonBuilder().WithCustomId("portal.rename").WithLabel("✏️").WithStyle(ButtonStyle.Secondary);
+                var hide = new ButtonBuilder().WithCustomId("portal.hide").WithLabel("🔒").WithStyle(ButtonStyle.Secondary);
+                var limit = new ButtonBuilder().WithCustomId("portal.limit").WithLabel("🫂").WithStyle(ButtonStyle.Secondary);
+                var kick = new ButtonBuilder().WithCustomId("portal.kick").WithLabel("🚫").WithStyle(ButtonStyle.Secondary);
+                var owner = new ButtonBuilder().WithCustomId("portal.owner").WithLabel("👤").WithStyle(ButtonStyle.Secondary);
+                var lock_ = new ButtonBuilder().WithCustomId("portal.lock").WithLabel("👤").WithStyle(ButtonStyle.Secondary);
 
                 //Component with buttons
-                var components = new ComponentBuilder().WithButton(rename).WithButton(hide).WithButton(owner).WithButton(limit).WithButton(kick);
+                var components = new ComponentBuilder().WithButton(rename).WithButton(hide).WithButton(owner).WithButton(limit).WithButton(kick).WithButton(lock_);
 
                 //Final embed
                 var embed = new EmbedBuilder()
@@ -89,10 +105,11 @@ namespace Squad.Bot.Commands
                     Description = "You can change the configuration of your room using interactions." +
                                   "\n" +
                                   "\n✏️ — change the name of the room" +
-                                  "\n🔒 — hide/show the room" +
+                                  "\n👁 — hide/show the room" +
                                   "\n🫂 — change the user limit" +
                                   "\n🚫 — kick the participant out of the room" +
-                                  "\n👤 — change the owner of the room",
+                                  "\n👤 — change the owner of the room" +
+                                  "\n🔒 — change the owner of the room",
                     Color = CustomColors.Default,
                 }.WithAuthor(name: "Private room management", iconUrl: "https://cdn.discordapp.com/emojis/963689541724688404.webp?size=128&quality=lossless");
 
@@ -178,6 +195,18 @@ namespace Squad.Bot.Commands
         public async Task Owner(IUser newOwner)
         {
             await Logger.LogInfo($"owner {newOwner}");
+            var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
+
+            if (Context.Channel.Id == savedPortal.SettingsChannelID && Context.Guild.CurrentUser.VoiceChannel.CategoryId == savedPortal.CategoryID)
+            {
+
+            }
+        }
+
+        [SlashCommand("lock", "Change the owner of the room")]
+        public async Task Lock()
+        {
+            await Logger.LogInfo($"lock");
             var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
             if (Context.Channel.Id == savedPortal.SettingsChannelID && Context.Guild.CurrentUser.VoiceChannel.CategoryId == savedPortal.CategoryID)
