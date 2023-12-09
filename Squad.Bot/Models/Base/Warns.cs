@@ -20,7 +20,7 @@ namespace Squad.Bot.Models.Base
 
         [Required(ErrorMessage = "You must to specify a reason")]
         [MaxLength(150)]
-        public string Reason { get; set; } = string.Empty;
+        public string Reason { get; set; } = null!;
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }

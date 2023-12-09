@@ -42,13 +42,14 @@ namespace Squad.Bot.Commands
                 if(Context.Guild.GetCategoryChannel(savedPortal.CategoryID) == null && Context.Guild.GetVoiceChannel(savedPortal.ChannelID) == null && Context.Guild.GetTextChannel(savedPortal.SettingsChannelID) == null)
                 {
                     _dbContext.PrivateRooms.Remove(savedPortal);
-                    // WARNING: goto may cause many problems in future
+                    await _dbContext.SaveChangesAsync();
+                    // UNSAFE: goto may cause many problems in future
                     goto N;
                 }
                 else
                 {
                     var component = new ComponentBuilder()
-                                            .WithButton(label: "Delete", customId: "portal:delete", style: ButtonStyle.Danger);
+                                            .WithButton(label: "Delete", customId: "portal.delete", style: ButtonStyle.Danger);
 
                     await RespondAsync(text: $"{Context.User.Username}, private rooms already created", 
                                                                          components: component.Build(), 
@@ -85,15 +86,15 @@ namespace Squad.Bot.Commands
                 await _dbContext.PrivateRooms.AddAsync(new Models.Base.PrivateRooms { CategoryID = category.Id, 
                                                                                       ChannelID = voiceChannel.Id, 
                                                                                       SettingsChannelID = settingsChannel.Id, 
-                                                                                      Guilds = savedPortal.Guilds });
+                                                                                      Guilds = await _dbContext.Guilds.FirstAsync(x => x.Id == Context.Guild.Id) });
                 await _dbContext.SaveChangesAsync();
 
                 //Buttons
-                var rename = new ButtonBuilder().WithCustomId("portal.rename").WithLabel("✏️").WithStyle(ButtonStyle.Secondary);
+                var rename = new ButtonBuilder().WithCustomId("portal.rename:*").WithLabel("✏️").WithStyle(ButtonStyle.Secondary);
                 var hide = new ButtonBuilder().WithCustomId("portal.hide").WithLabel("🔒").WithStyle(ButtonStyle.Secondary);
-                var limit = new ButtonBuilder().WithCustomId("portal.limit").WithLabel("🫂").WithStyle(ButtonStyle.Secondary);
-                var kick = new ButtonBuilder().WithCustomId("portal.kick").WithLabel("🚫").WithStyle(ButtonStyle.Secondary);
-                var owner = new ButtonBuilder().WithCustomId("portal.owner").WithLabel("👤").WithStyle(ButtonStyle.Secondary);
+                var limit = new ButtonBuilder().WithCustomId("portal.limit:*").WithLabel("🫂").WithStyle(ButtonStyle.Secondary);
+                var kick = new ButtonBuilder().WithCustomId("portal.kick:*").WithLabel("🚫").WithStyle(ButtonStyle.Secondary);
+                var owner = new ButtonBuilder().WithCustomId("portal.owner:*").WithLabel("👤").WithStyle(ButtonStyle.Secondary);
                 var lock_ = new ButtonBuilder().WithCustomId("portal.lock").WithLabel("👤").WithStyle(ButtonStyle.Secondary);
 
                 //Component with buttons
@@ -131,10 +132,12 @@ namespace Squad.Bot.Commands
         {
             var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
-            if(Context.Channel.Id == savedPortal.SettingsChannelID && Context.Guild.CurrentUser.VoiceChannel.CategoryId == savedPortal.CategoryID)
+            var user = Context.Guild.GetUser(Context.User.Id);
+
+            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.CategoryId == savedPortal.CategoryID)
             {
                 // TODO: add user owner check
-                await Context.Guild.CurrentUser.VoiceChannel.ModifyAsync(x => x.Name = channelName);
+                await user.VoiceChannel.ModifyAsync(x => x.Name = channelName);
 
                 var embed = new EmbedBuilder
                 {
@@ -161,7 +164,9 @@ namespace Squad.Bot.Commands
             await Logger.LogInfo("hide");
             var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && Context.Guild.CurrentUser.VoiceChannel.CategoryId == savedPortal.CategoryID)
+            var user = Context.Guild.GetUser(Context.User.Id);
+
+            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.CategoryId == savedPortal.CategoryID)
             {
 
             }
@@ -173,7 +178,9 @@ namespace Squad.Bot.Commands
             await Logger.LogInfo($"kick {user}");
             var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && Context.Guild.CurrentUser.VoiceChannel.CategoryId == savedPortal.CategoryID)
+            var user = Context.Guild.GetUser(Context.User.Id);
+
+            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.CategoryId == savedPortal.CategoryID)
             {
 
             }
@@ -185,7 +192,9 @@ namespace Squad.Bot.Commands
             await Logger.LogInfo($"limit {limit}");
             var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && Context.Guild.CurrentUser.VoiceChannel.CategoryId == savedPortal.CategoryID)
+            var user = Context.Guild.GetUser(Context.User.Id);
+
+            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.CategoryId == savedPortal.CategoryID)
             {
 
             }
@@ -197,7 +206,9 @@ namespace Squad.Bot.Commands
             await Logger.LogInfo($"owner {newOwner}");
             var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && Context.Guild.CurrentUser.VoiceChannel.CategoryId == savedPortal.CategoryID)
+            var user = Context.Guild.GetUser(Context.User.Id);
+
+            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.CategoryId == savedPortal.CategoryID)
             {
 
             }
@@ -209,7 +220,9 @@ namespace Squad.Bot.Commands
             await Logger.LogInfo($"lock");
             var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && Context.Guild.CurrentUser.VoiceChannel.CategoryId == savedPortal.CategoryID)
+            var user = Context.Guild.GetUser(Context.User.Id);
+
+            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.CategoryId == savedPortal.CategoryID)
             {
 
             }

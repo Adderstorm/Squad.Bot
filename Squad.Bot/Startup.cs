@@ -42,6 +42,9 @@ namespace Squad.Bot
         /// <returns>A <see cref="Task"/> that represents the asynchronous running of the bot.</returns>
         private async Task RunAsync(IHost host)
         {
+            // Create db if not exists, lol
+            host.CreateDbIfNotExists();
+
             using IServiceScope serviceScope = host.Services.CreateAsyncScope();
             IServiceProvider services = serviceScope.ServiceProvider;
 

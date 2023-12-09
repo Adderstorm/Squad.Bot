@@ -11,12 +11,11 @@ namespace Squad.Bot.Models.Base
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public ulong Id { get; set; }
 
-        [Required(ErrorMessage = "Field serverName must contain the server name")]
         public string ServerName { get; set; } = string.Empty;
 
-        public ICollection<BlackList> BlackList { get; set; } = null!;
+        public ICollection<BlackList>? BlackList { get; set; }
 
-        public ICollection<TotalMembers> TotalMembers { get; set; } = null!;
+        public ICollection<TotalMembers>? TotalMembers { get; set; }
 
         public DateTime AddedAt { get; set; } = DateTime.Now;
     }

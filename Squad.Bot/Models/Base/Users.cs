@@ -12,12 +12,12 @@ namespace Squad.Bot.Models.Base
         public ulong Id { get; set; }
 
         [Required]
-        public string Nick { get; set; } = string.Empty;
+        public string Nick { get; set; } = null!;
 
         public float XP { get; set; } = 0f;
 
-        public ICollection<Warns> Warns { get; set; } = null!;
+        public ICollection<Warns>? Warns { get; set; }
 
-        public ICollection<BlackList> BlackList { get; set; } = null!;
+        public ICollection<BlackList>? BlackList { get; set; }
     }
 }
