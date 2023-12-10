@@ -1,4 +1,7 @@
-﻿namespace Squad.Bot.Logging
+﻿using LogMessageDiscord = Discord.LogMessage;
+using LogTypeDiscord = Discord.LogSeverity;
+
+namespace Squad.Bot.Logging
 {
     /// <summary>
     /// Provides a set of static methods for logging messages to the console.
@@ -44,7 +47,19 @@
         /// <returns>A task that represents the asynchronous operation.</returns>
         public static Task LogInfo(string message) => LogToConsole(new LogMessage(LogType.Info, message));
 
-        // TODO: Implement logging for discord logging system
+        /// <summary>
+        /// Logs a message of type <see cref="LogType.DataBase"/> to the console.
+        /// </summary>
+        /// <param name="message">The message to log.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public static Task LogDBInfo(string message) => LogToConsole(new LogMessage(LogType.DataBase, message));
+
+        /// <summary>
+        /// Logs a message to the Discord logging system.
+        /// </summary>
+        /// <param name="message">The message to log.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public static Task LogDiscord(LogMessageDiscord message) => LogToConsole(message);
 
         /// <summary>
         /// Logs a message to the console.
@@ -74,6 +89,34 @@
         }
 
         /// <summary>
+        /// Logs a message to the console.
+        /// </summary>
+        /// <param name="logMessage">The message to log.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        private static Task LogToConsole(LogMessageDiscord logMessage)
+        {
+            // Fire and forget
+            LogTasks.Add(Task.Run(() =>
+            {
+            lock (_lock)
+            {
+                Console.Write($"{logMessage.Source} ");
+                    PrintSeverityPrefix(logMessage.Severity);
+                    Console.WriteLine($" - {logMessage.Message}");
+
+                    if (logMessage.Exception != null)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine(logMessage.Exception.Message);
+                    }
+
+                    LogTasks = LogTasks.Where(x => !x.IsCanceled && !x.IsCompleted && !x.IsCompletedSuccessfully && !x.IsFaulted).ToList();
+                }
+            }));
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
         /// Prints a prefix for the given log severity to the console.
         /// </summary>
         /// <param name="severity">The severity of the log message.</param>
@@ -88,6 +131,32 @@
                 LogType.CommandExecuted => ConsoleColor.DarkBlue,
                 LogType.EventRegistered => ConsoleColor.DarkBlue,
                 LogType.Info => ConsoleColor.DarkYellow,
+                LogType.DataBase => ConsoleColor.DarkMagenta,
+                _ => throw new NotImplementedException("That log type doesn't exist"),
+            };
+            Console.ForegroundColor = severityColor;
+            Console.Write(severity.ToString());
+            Console.ForegroundColor = oldColor;
+            Console.Write("]");
+        }
+
+        /// <summary>
+        /// Prints a prefix for the given log severity to the console.
+        /// </summary>
+        /// <param name="severity">The severity of the log message.</param>
+        private static void PrintSeverityPrefix(LogTypeDiscord severity)
+        {
+            // Looks like '[Info]' but adds color to the inner text, and restores the old color
+            Console.Write("[");
+            var oldColor = Console.ForegroundColor;
+            var severityColor = severity switch
+            {
+                LogTypeDiscord.Error => ConsoleColor.Red,
+                LogTypeDiscord.Info => ConsoleColor.DarkYellow,
+                LogTypeDiscord.Critical => ConsoleColor.DarkRed,
+                LogTypeDiscord.Warning => ConsoleColor.DarkYellow,
+                LogTypeDiscord.Verbose => ConsoleColor.DarkRed,
+                LogTypeDiscord.Debug => ConsoleColor.DarkYellow,
                 _ => throw new NotImplementedException("That log type doesn't exist"),
             };
             Console.ForegroundColor = severityColor;

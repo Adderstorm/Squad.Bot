@@ -54,6 +54,8 @@ namespace Squad.Bot
             // Initialize the InteractionHandler service, which will register and execute commands
             await services.GetRequiredService<InteractionHandler>().InitializeAsync();
 
+            _client.Log += Logger.LogDiscord;
+
             // Login to Discord using the bot token from appsettings.json
             await _client.LoginAsync(TokenType.Bot, _configuration["BotSettings:Token"]);
 
@@ -92,8 +94,10 @@ namespace Squad.Bot
                     TotalShards = Convert.ToInt16(_configuration["BotSettings:TotalShards"])
                 }));
 
-                // Add the SquadDBContext service to the service collection, using the provided connection string to configure the context
-                services.AddDbContext<SquadDBContext>(options => options.UseSqlite(_configuration["ConnectionStrings:DbConnection"]));
+            // Add the SquadDBContext service to the service collection, using the provided connection string to configure the context
+            services.AddDbContext<SquadDBContext>(options => { options.UseSqlite(_configuration["ConnectionStrings:DbConnection"]);
+                                                               options.LogTo(x => Logger.LogDBInfo(x),
+                                                                             minimumLevel: Microsoft.Extensions.Logging.LogLevel.Information); });
 
                 // Add the InteractionService service to the service collection, using the DiscordSocketClient service that was just added
                 services.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()));

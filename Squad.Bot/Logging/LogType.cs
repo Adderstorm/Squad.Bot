@@ -23,6 +23,11 @@
         /// <summary>
         /// Indicates that general information was recorded.
         /// </summary>
-        Info
+        Info,
+
+        /// <summary>
+        /// Indicates that a database operation was performed.
+        /// </summary>
+        DataBase,
     }
 }

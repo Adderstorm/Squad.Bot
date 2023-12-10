@@ -8,7 +8,6 @@ using Squad.Bot.Events;
 using Squad.Bot.Logging;
 using System.Reflection;
 using IResult = Discord.Interactions.IResult;
-using LogMessage = Discord.LogMessage;
 
 namespace Squad.Bot.Discord
 {
@@ -55,7 +54,6 @@ namespace Squad.Bot.Discord
 
             // Process the InteractionCreated payloads to execute Interactions commands
             _client.InteractionCreated += HandleInteraction;
-            _client.Log += Log;
             _client.Ready += ReadyAsync;
 
             // Subscribes for events
@@ -66,13 +64,6 @@ namespace Squad.Bot.Discord
 
             // Process the command execution results 
             _handler.InteractionExecuted += InteractionExecuted;
-        }
-
-        private Task Log(LogMessage message)
-        {
-            Console.WriteLine(message);
-
-            return Task.CompletedTask;
         }
 
         private async Task ReadyAsync()
