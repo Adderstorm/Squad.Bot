@@ -130,11 +130,9 @@ namespace Squad.Bot.Commands
         [SlashCommand("rename", "Change the name of the room")]
         public async Task Rename(string channelName)
         {
-            var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
-
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.CategoryId == savedPortal.CategoryID)
+            if (IsUserInPRoom(Context, user))
             {
                 // TODO: add user owner check
                 await user.VoiceChannel.ModifyAsync(x => x.Name = channelName);
@@ -162,25 +160,23 @@ namespace Squad.Bot.Commands
         public async Task Hide()
         {
             await Logger.LogInfo("hide");
-            var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.CategoryId == savedPortal.CategoryID)
+            if (IsUserInPRoom(Context, user))
             {
 
             }
         }
 
         [SlashCommand("kick", "Kick the participant out of the room")]
-        public async Task Kick(IUser user)
+        public async Task Kick(IUser userToKick)
         {
-            await Logger.LogInfo($"kick {user}");
-            var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
+            await Logger.LogInfo($"kick {userToKick}");
 
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.CategoryId == savedPortal.CategoryID)
+            if (IsUserInPRoom(Context, user))
             {
 
             }
@@ -190,11 +186,10 @@ namespace Squad.Bot.Commands
         public async Task Limit(ushort limit = 5)
         {
             await Logger.LogInfo($"limit {limit}");
-            var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.CategoryId == savedPortal.CategoryID)
+            if (IsUserInPRoom(Context, user))
             {
 
             }
@@ -204,11 +199,10 @@ namespace Squad.Bot.Commands
         public async Task Owner(IUser newOwner)
         {
             await Logger.LogInfo($"owner {newOwner}");
-            var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.CategoryId == savedPortal.CategoryID)
+            if (IsUserInPRoom(Context, user))
             {
 
             }
@@ -218,14 +212,23 @@ namespace Squad.Bot.Commands
         public async Task Lock()
         {
             await Logger.LogInfo($"lock");
-            var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.CategoryId == savedPortal.CategoryID)
+            if (IsUserInPRoom(Context, user))
             {
 
             }
+        }
+
+        private bool IsUserInPRoom(SocketInteractionContext context, SocketGuildUser user)
+        {
+            var savedPortal = _dbContext.PrivateRooms.FirstOrDefault(x => x.Guilds.Id == Context.Guild.Id);
+
+            if (context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.CategoryId == savedPortal.CategoryID)
+                return true;
+            else
+                return false;
         }
     }
 }

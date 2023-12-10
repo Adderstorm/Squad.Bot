@@ -8,12 +8,12 @@
         /// <summary>
         /// A list of tasks that are currently running for logging.
         /// </summary>
-        public static List<Task> LogTasks { get; set; } = new List<Task>();
+        public static List<Task> LogTasks { get; set; } = [];
 
         /// <summary>
         /// A lock object for synchronizing access to the <see cref="LogTasks"/> list.
         /// </summary>
-        private static readonly object _lock = new object();
+        private static readonly object _lock = new();
 
         /// <summary>
         /// Logs a message of type <see cref="LogType.CommandExecuted"/> to the console.
@@ -44,12 +44,14 @@
         /// <returns>A task that represents the asynchronous operation.</returns>
         public static Task LogInfo(string message) => LogToConsole(new LogMessage(LogType.Info, message));
 
+        // TODO: Implement logging for discord logging system
+
         /// <summary>
         /// Logs a message to the console.
         /// </summary>
         /// <param name="logMessage">The message to log.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        public static Task LogToConsole(LogMessage logMessage)
+        private static Task LogToConsole(LogMessage logMessage)
         {
             // Fire and forget
             LogTasks.Add(Task.Run(() =>

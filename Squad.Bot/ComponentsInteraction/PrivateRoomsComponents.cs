@@ -1,8 +1,10 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Squad.Bot.Data;
 using Squad.Bot.Logging;
+using Squad.Bot.Models.Base;
 using Squad.Bot.Utilities;
 
 namespace Squad.Bot.ComponentsInteraction
@@ -56,7 +58,7 @@ namespace Squad.Bot.ComponentsInteraction
 
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            if (user.VoiceChannel.Category.Id == savedPortal.CategoryID)
+            if (IsUserInPRoom(Context, user))
             {
                 // TODO: add user owner check
                 await user.VoiceChannel.ModifyAsync(x => x.Name = channelName);
@@ -85,12 +87,10 @@ namespace Squad.Bot.ComponentsInteraction
         [ComponentInteraction("portal.hide")]
         public async Task Hide()
         {
-            var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
-
             var user = Context.Guild.GetUser(Context.User.Id);
 
             // TODO: Fill embeds with information
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.CategoryId == savedPortal.CategoryID)
+            if (IsUserInPRoom(Context, user))
             {
                 if(user.VoiceChannel.PermissionOverwrites.FirstOrDefault().Permissions.ViewChannel == PermValue.Allow || user.VoiceChannel.PermissionOverwrites.FirstOrDefault().Permissions.ViewChannel == PermValue.Inherit)
                 {
@@ -145,11 +145,11 @@ namespace Squad.Bot.ComponentsInteraction
         [ComponentInteraction("portal.kick:*")]
         public async Task Kick(IUser userToKick)
         {
-            var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
+            await Logger.LogInfo($"kick {userToKick}");
 
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.Category.Id == savedPortal.CategoryID)
+            if (IsUserInPRoom(Context, user))
             {
 
             }
@@ -159,11 +159,10 @@ namespace Squad.Bot.ComponentsInteraction
         public async Task Limit(ushort limit)
         {
             await Logger.LogInfo($"limit {limit}");
-            var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.Category.Id == savedPortal.CategoryID)
+            if (IsUserInPRoom(Context, user))
             {
 
             }
@@ -173,11 +172,10 @@ namespace Squad.Bot.ComponentsInteraction
         public async Task Owner(IUser newOwner)
         {
             await Logger.LogInfo($"owner {newOwner}");
-            var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.Category.Id == savedPortal.CategoryID)
+            if (IsUserInPRoom(Context, user))
             {
 
             }
@@ -187,14 +185,22 @@ namespace Squad.Bot.ComponentsInteraction
         public async Task Lock()
         {
             await Logger.LogInfo($"lock");
-            var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            if (Context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.Category.Id == savedPortal.CategoryID)
+            if (IsUserInPRoom(Context, user))
             {
 
             }
+        }
+        private bool IsUserInPRoom(SocketInteractionContext context, SocketGuildUser user)
+        {
+            var savedPortal = _dbContext.PrivateRooms.FirstOrDefault(x => x.Guilds.Id == Context.Guild.Id);
+
+            if (context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel.CategoryId == savedPortal.CategoryID)
+                return true;
+            else
+                return false;
         }
     }
 }
