@@ -13,6 +13,8 @@ namespace Squad.Bot.Logging
         /// </summary>
         public static List<Task> LogTasks { get; set; } = [];
 
+        private static readonly string filePath = Path.Combine(Directory.GetCurrentDirectory(), "logData.txt");
+
         /// <summary>
         /// A lock object for synchronizing access to the <see cref="LogTasks"/> list.
         /// </summary>
@@ -80,6 +82,13 @@ namespace Squad.Bot.Logging
                     {
                         Console.WriteLine();
                         Console.WriteLine(logMessage.Exception.Message);
+                        Console.WriteLine(logMessage.Exception.StackTrace ?? "No extra StackTrace");
+                        Console.WriteLine(logMessage.Exception.Source ?? "No extra Source information");
+                        if(logMessage.Severity == LogType.Exception)
+                        {
+                            // TODO: Register and send message about errors here
+                            logMessage.LogToFile();
+                        }
                     }
 
                     LogTasks = LogTasks.Where(x => !x.IsCanceled && !x.IsCompleted && !x.IsCompletedSuccessfully && !x.IsFaulted).ToList();
@@ -98,9 +107,9 @@ namespace Squad.Bot.Logging
             // Fire and forget
             LogTasks.Add(Task.Run(() =>
             {
-            lock (_lock)
-            {
-                Console.Write($"{logMessage.Source} ");
+                lock (_lock)
+                {
+                    Console.Write($"{logMessage.Source} ");
                     PrintSeverityPrefix(logMessage.Severity);
                     Console.WriteLine($" - {logMessage.Message}");
 
@@ -108,6 +117,14 @@ namespace Squad.Bot.Logging
                     {
                         Console.WriteLine();
                         Console.WriteLine(logMessage.Exception.Message);
+                        Console.WriteLine(logMessage.Exception.StackTrace ?? "No extra StackTrace");
+                        Console.WriteLine(logMessage.Exception.Source ?? "No extra Source information");
+                    }
+
+                    if(logMessage.Severity <= LogTypeDiscord.Warning)
+                    {
+                        // TODO: Register and send message about errors here
+                        logMessage.LogToFile();
                     }
 
                     LogTasks = LogTasks.Where(x => !x.IsCanceled && !x.IsCompleted && !x.IsCompletedSuccessfully && !x.IsFaulted).ToList();
@@ -163,6 +180,17 @@ namespace Squad.Bot.Logging
             Console.Write(severity.ToString());
             Console.ForegroundColor = oldColor;
             Console.Write("]");
+        }
+
+        // TODO: Create file logging system
+        private static void LogToFile(this LogMessage logMessage)
+        {
+            ArgumentNullException.ThrowIfNull(logMessage);
+        }
+
+        private static void LogToFile(this LogMessageDiscord logMessage)
+        {
+            throw new NotImplementedException(nameof(logMessage));
         }
     }
 }
