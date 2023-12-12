@@ -32,7 +32,7 @@ namespace Squad.Bot.Commands
         /// <param name="categoryName">The name of the category.</param>
         [SlashCommand("invite", "Create a portal for the private rooms")]
         [DefaultMemberPermissions(GuildPermission.Administrator)]
-        public async Task Invite(string voiceChannelName = "[➕] Create", string settingsChannelName = "[⚙️] Settings", string categoryName = "Portal")
+        public async Task Invite(string voiceChannelName = "➕・Create", string settingsChannelName = "⚙️・Settings", string categoryName = "Portal")
         {
             N:
             var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
@@ -51,7 +51,7 @@ namespace Squad.Bot.Commands
                     var component = new ComponentBuilder()
                                             .WithButton(label: "Delete", customId: "portal.delete", style: ButtonStyle.Danger);
 
-                    await RespondAsync(text: $"{Context.User.Username}, private rooms already created", 
+                    await RespondAsync(text: $"{Context.Guild.CurrentUser.Nickname ?? Context.User.Username ?? Context.User.GlobalName}, private rooms already created", 
                                                                          components: component.Build(), 
                                                                          ephemeral: true);
                 }
@@ -90,11 +90,11 @@ namespace Squad.Bot.Commands
                 await _dbContext.SaveChangesAsync();
 
                 //Buttons
-                var rename = new ButtonBuilder().WithCustomId("portal.rename:*").WithLabel("✏️").WithStyle(ButtonStyle.Secondary);
+                var rename = new ButtonBuilder().WithCustomId("portal.rename").WithLabel("✏️").WithStyle(ButtonStyle.Secondary);
                 var hide = new ButtonBuilder().WithCustomId("portal.hide").WithLabel("🔒").WithStyle(ButtonStyle.Secondary);
-                var limit = new ButtonBuilder().WithCustomId("portal.limit:*").WithLabel("🫂").WithStyle(ButtonStyle.Secondary);
-                var kick = new ButtonBuilder().WithCustomId("portal.kick:*").WithLabel("🚫").WithStyle(ButtonStyle.Secondary);
-                var owner = new ButtonBuilder().WithCustomId("portal.owner:*").WithLabel("👤").WithStyle(ButtonStyle.Secondary);
+                var limit = new ButtonBuilder().WithCustomId("portal.limit").WithLabel("🫂").WithStyle(ButtonStyle.Secondary);
+                var kick = new ButtonBuilder().WithCustomId("portal.kick").WithLabel("🚫").WithStyle(ButtonStyle.Secondary);
+                var owner = new ButtonBuilder().WithCustomId("portal.owner").WithLabel("👤").WithStyle(ButtonStyle.Secondary);
                 var lock_ = new ButtonBuilder().WithCustomId("portal.lock").WithLabel("👤").WithStyle(ButtonStyle.Secondary);
 
                 //Component with buttons
@@ -110,7 +110,7 @@ namespace Squad.Bot.Commands
                                   "\n🫂 — change the user limit" +
                                   "\n🚫 — kick the participant out of the room" +
                                   "\n👤 — change the owner of the room" +
-                                  "\n🔒 — change the owner of the room",
+                                  "\n🔒 — lock your room",
                     Color = CustomColors.Default,
                 }.WithAuthor(name: "Private room management", iconUrl: "https://cdn.discordapp.com/emojis/963689541724688404.webp?size=128&quality=lossless");
 
@@ -120,7 +120,7 @@ namespace Squad.Bot.Commands
                 {
                     Title = $"✅ Created private rooms.",
                     Color = CustomColors.Success,
-                }.WithAuthor(name: Context.Guild.CurrentUser.Nickname, iconUrl: Context.Guild.CurrentUser.GetGuildAvatarUrl());
+                }.WithAuthor(name: Context.Guild.CurrentUser.Nickname ?? Context.User.Username ?? Context.User.GlobalName, iconUrl: Context.Guild.CurrentUser.GetGuildAvatarUrl());
 
                 await RespondAsync(embed: successEmbed.Build());
             }
@@ -208,7 +208,7 @@ namespace Squad.Bot.Commands
             }
         }
 
-        [SlashCommand("lock", "Change the owner of the room")]
+        [SlashCommand("lock", "Deny to connect for everyone")]
         public async Task Lock()
         {
             await Logger.LogInfo($"lock");
