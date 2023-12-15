@@ -4,11 +4,9 @@ using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Squad.Bot.Data;
 using Squad.Bot.Logging;
-using Squad.Bot.Models.Base;
 using Squad.Bot.Utilities;
-using Discord.Rest;
 
-namespace Squad.Bot.ComponentsInteraction
+namespace Squad.Bot.Components
 {
     public class PrivateRoomsComponents(SquadDBContext dbContext) : InteractionModuleBase<SocketInteractionContext>
     {
