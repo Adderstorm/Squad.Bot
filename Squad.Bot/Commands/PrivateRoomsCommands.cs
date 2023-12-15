@@ -63,25 +63,25 @@ namespace Squad.Bot.Commands
                 // Permissions overwrites
                 var categoryOverwrites = new PermissionOverwriteHelper(everyoneRoleId, PermissionTarget.Role)
                 {
-                    Permissions = PermissionOverwriteHelper.SetOverwritePermissions(viewChannel: PermValue.Allow)
+                    Permissions = new(viewChannel: PermValue.Allow)
                 };
                 var voiceOverwrites = new PermissionOverwriteHelper(everyoneRoleId, PermissionTarget.Role)
                 {
-                    Permissions = PermissionOverwriteHelper.SetOverwritePermissions(connect: PermValue.Allow, speak: PermValue.Deny)
+                    Permissions = new(connect: PermValue.Allow, speak: PermValue.Deny)
                 };
                 var settingsOverwrites = new PermissionOverwriteHelper(everyoneRoleId, PermissionTarget.Role)
                 {
-                    Permissions = PermissionOverwriteHelper.SetOverwritePermissions()
+                    Permissions = new()
                 };
 
-                var category = await Context.Guild.CreateCategoryChannelAsync(categoryName, tcp => { tcp.PermissionOverwrites = categoryOverwrites.CreateOverwrites(); });
+                var category = await Context.Guild.CreateCategoryChannelAsync(categoryName, tcp => { tcp.PermissionOverwrites = categoryOverwrites.CreateOptionalOverwrites(); });
 
                 var voiceChannel = await Context.Guild.CreateVoiceChannelAsync(voiceChannelName, tcp => {tcp.CategoryId = category.Id;
-                                                                                                         tcp.PermissionOverwrites = voiceOverwrites.CreateOverwrites();});
+                                                                                                         tcp.PermissionOverwrites = voiceOverwrites.CreateOptionalOverwrites();});
 
                 var settingsChannel = await Context.Guild.CreateTextChannelAsync(settingsChannelName, tcp => {tcp.CategoryId = category.Id;
                                                                                                           tcp.Topic = "manage private rooms";
-                                                                                                          tcp.PermissionOverwrites = settingsOverwrites.CreateOverwrites();});
+                                                                                                          tcp.PermissionOverwrites = settingsOverwrites.CreateOptionalOverwrites();});
 
                 await _dbContext.PrivateRooms.AddAsync(new Models.Base.PrivateRooms { CategoryID = category.Id, 
                                                                                       ChannelID = voiceChannel.Id, 

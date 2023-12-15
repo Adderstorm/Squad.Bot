@@ -6,6 +6,7 @@ using Squad.Bot.Data;
 using Squad.Bot.Logging;
 using Squad.Bot.Models.Base;
 using Squad.Bot.Utilities;
+using Discord.Rest;
 
 namespace Squad.Bot.ComponentsInteraction
 {
@@ -50,7 +51,6 @@ namespace Squad.Bot.ComponentsInteraction
             await RespondAsync(embed: embed.Build(), ephemeral: true);
         }
 
-        // TODO: Bug: the bot revokes all channel rights when they are redefined
         // TODO: Change the stubs with the working code(need to learn Modals)
         [ComponentInteraction("portal.hide")]
         public async Task Hide()
@@ -60,22 +60,24 @@ namespace Squad.Bot.ComponentsInteraction
             // TODO: Fill embeds with information
             if (IsUserInPRoom(Context, user) && IsUserOwner(user))
             {
-                var userChannelPermissions = user.VoiceChannel.PermissionOverwrites.FirstOrDefault().Permissions;
+                var everyoneRole = Context.Guild.Roles.First(x => x.IsEveryone);
 
-                if(userChannelPermissions.ViewChannel == PermValue.Allow || userChannelPermissions.ViewChannel == PermValue.Inherit)
+                var ChannelPermissions = user.VoiceChannel.GetPermissionOverwrite(everyoneRole) ?? new();
+
+                if (ChannelPermissions.ViewChannel == PermValue.Allow || 
+                    ChannelPermissions.ViewChannel == PermValue.Inherit)
                 {
-                    ulong everyoneRoleId = Context.Guild.Roles.First(x => x.Name == "@everyone").Id;
+                    ChannelPermissions = ChannelPermissions.Modify(viewChannel: PermValue.Deny);
 
-                    var voiceOverwrites = new PermissionOverwriteHelper(everyoneRoleId, PermissionTarget.Role)
-                    {
-                        Permissions = PermissionOverwriteHelper.SetOverwritePermissions(viewChannel: PermValue.Deny)
-                    };
-                    await user.VoiceChannel.ModifyAsync(tsp => { tsp.PermissionOverwrites = voiceOverwrites.CreateOverwrites(); });
-                    
+                    await Logger.LogInfo($"roleId {everyoneRole.Id} | {everyoneRole.Name}");
+                    await Logger.LogInfo($"channelPermissions {ChannelPermissions.ViewChannel} | {ChannelPermissions.ToString}");
+
+                    await user.VoiceChannel.AddPermissionOverwriteAsync(everyoneRole, ChannelPermissions);
+
                     EmbedBuilder embed = new()
                     {
                         Title = "Show/Hide room for everyone",
-                        Description = "",
+                        Description = $"{Context.Guild.CurrentUser.Nickname ?? Context.User.Username ?? Context.User.GlobalName}, voice channel is hidden",
                         Color = CustomColors.Success
                     };
 
@@ -83,16 +85,14 @@ namespace Squad.Bot.ComponentsInteraction
                 }
                 else
                 {
-                    var voiceOverwrites = new PermissionOverwriteHelper(Context.User.Id, PermissionTarget.User)
-                    {
-                        Permissions = PermissionOverwriteHelper.SetOverwritePermissions(viewChannel: PermValue.Allow)
-                    };
-                    await user.VoiceChannel.ModifyAsync(tsp => { tsp.PermissionOverwrites = voiceOverwrites.CreateOverwrites(); });
+                    ChannelPermissions = ChannelPermissions.Modify(viewChannel: PermValue.Allow);
+
+                    await user.VoiceChannel.AddPermissionOverwriteAsync(everyoneRole, ChannelPermissions);
 
                     EmbedBuilder embed = new()
                     {
                         Title = "Show/Hide room for everyone",
-                        Description = $"{Context.Guild.CurrentUser.Nickname ?? Context.User.Username ?? Context.User.GlobalName}, ",
+                        Description = $"{Context.Guild.CurrentUser.Nickname ?? Context.User.Username ?? Context.User.GlobalName}, voice channel is publicly available",
                         Color = CustomColors.Success
                     };
 
@@ -139,19 +139,18 @@ namespace Squad.Bot.ComponentsInteraction
         {
             var user = Context.Guild.GetUser(Context.User.Id);
 
+
             if (IsUserInPRoom(Context, user) && IsUserOwner(user))
             {
-                var userChannelPermissions = user.VoiceChannel.PermissionOverwrites.FirstOrDefault().Permissions;
+                var everyoneRole = Context.Guild.Roles.First(x => x.IsEveryone);
 
-                if (userChannelPermissions.Connect == PermValue.Allow || userChannelPermissions.Connect == PermValue.Inherit)
+                var ChannelPermissions = user.VoiceChannel.GetPermissionOverwrite(everyoneRole) ?? new();
+
+                if (ChannelPermissions.Connect == PermValue.Allow || ChannelPermissions.Connect == PermValue.Inherit)
                 {
-                    ulong everyoneRoleId = Context.Guild.Roles.First(x => x.Name == "@everyone").Id;
+                    ChannelPermissions = ChannelPermissions.Modify(connect: PermValue.Deny);
 
-                    var voiceOverwrites = new PermissionOverwriteHelper(everyoneRoleId, PermissionTarget.Role)
-                    {
-                        Permissions = PermissionOverwriteHelper.SetOverwritePermissions(connect: PermValue.Deny)
-                    };
-                    await user.VoiceChannel.ModifyAsync(tsp => { tsp.PermissionOverwrites = voiceOverwrites.CreateOverwrites(); });
+                    await user.VoiceChannel.AddPermissionOverwriteAsync(everyoneRole, ChannelPermissions);
 
                     EmbedBuilder embed = new()
                     {
@@ -164,13 +163,9 @@ namespace Squad.Bot.ComponentsInteraction
                 }
                 else
                 {
-                    ulong everyoneRoleId = Context.Guild.Roles.First(x => x.Name == "@everyone").Id;
+                    ChannelPermissions = ChannelPermissions.Modify(connect: PermValue.Allow);
 
-                    var voiceOverwrites = new PermissionOverwriteHelper(everyoneRoleId, PermissionTarget.Role)
-                    {
-                        Permissions = PermissionOverwriteHelper.SetOverwritePermissions(connect: PermValue.Allow)
-                    };
-                    await user.VoiceChannel.ModifyAsync(tsp => { tsp.PermissionOverwrites = voiceOverwrites.CreateOverwrites(); });
+                    await user.VoiceChannel.AddPermissionOverwriteAsync(everyoneRole, ChannelPermissions);
 
                     EmbedBuilder embed = new()
                     {
@@ -220,8 +215,6 @@ namespace Squad.Bot.ComponentsInteraction
         [ComponentInteraction("portal.rename")]
         public async Task Rename()
         {
-            var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
-
             var user = Context.Guild.GetUser(Context.User.Id);
 
             if (IsUserInPRoom(Context, user) && IsUserOwner(user))

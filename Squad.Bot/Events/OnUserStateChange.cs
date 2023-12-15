@@ -51,14 +51,13 @@ namespace Squad.Bot.Events
             {
                 var permissions = new PermissionOverwriteHelper(user.Id, PermissionTarget.User)
                 {
-                    Permissions = PermissionOverwriteHelper.SetOverwritePermissions(muteMembers: PermValue.Allow,
-                                                                                    deafenMembers: PermValue.Allow,
-                                                                                    manageChannel: PermValue.Allow)
+                    Permissions = new(muteMembers: PermValue.Allow,
+                                      manageChannel: PermValue.Allow)
                 };
                 var guildUser = newState.VoiceChannel.Guild.GetUser(user.Id);
                 var newVoiceChannel = await newState.VoiceChannel.Guild.CreateVoiceChannelAsync($"{guildUser.Nickname ?? user.GlobalName ?? user.Username}'s channel", tcp => {
                                                                                                                                          tcp.CategoryId = savedPortal.CategoryID;
-                                                                                                                                         tcp.PermissionOverwrites = permissions.CreateOverwrites();
+                                                                                                                                         tcp.PermissionOverwrites = permissions.CreateOptionalOverwrites();
                                                                                                                                      });
 
                 var member = newState.VoiceChannel.Guild.GetUser(user.Id);
