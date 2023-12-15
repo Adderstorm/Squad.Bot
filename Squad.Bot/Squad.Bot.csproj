@@ -27,6 +27,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ComponentsInteraction\" />
+    <Folder Include="Components\" />
   </ItemGroup>
 </Project>
