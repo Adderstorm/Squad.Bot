@@ -69,7 +69,7 @@ namespace Squad.Bot.Discord
         private async Task ReadyAsync()
         {
             // Context & Slash commands can be automatically registered, but this process needs to happen after the client enters the READY state.
-            // Since Global Commands take around 1 hour to register, we should use a test guild to instantly update and test our commands.
+            // Since Global Commands take around 1 hour to register, should use a test guild to instantly update and test our commands.
 #if DEBUG
             await _handler.RegisterCommandsToGuildAsync(Convert.ToUInt64(_configuration["BotSettings:testGuild"]), true);
 #else            
@@ -86,7 +86,7 @@ namespace Squad.Bot.Discord
         {
             try
             {
-                // Create an execution context that matches the generic type parameter of your InteractionModuleBase<T> modules
+                // Create an execution context that matches the generic type parameter of InteractionModuleBase<T> modules
                 var ctx = new SocketInteractionContext(_client, arg);
                 await _handler.ExecuteCommandAsync(ctx, _services);
             }

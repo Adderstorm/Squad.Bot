@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Squad.Bot.Data;
 using Squad.Bot.Logging;
 using Squad.Bot.Utilities;
+using System.Diagnostics;
 
 namespace Squad.Bot.Components
 {
@@ -67,9 +68,6 @@ namespace Squad.Bot.Components
                 {
                     ChannelPermissions = ChannelPermissions.Modify(viewChannel: PermValue.Deny);
 
-                    await Logger.LogInfo($"roleId {everyoneRole.Id} | {everyoneRole.Name}");
-                    await Logger.LogInfo($"channelPermissions {ChannelPermissions.ViewChannel} | {ChannelPermissions.ToString}");
-
                     await user.VoiceChannel.AddPermissionOverwriteAsync(everyoneRole, ChannelPermissions);
 
                     EmbedBuilder embed = new()
@@ -117,7 +115,20 @@ namespace Squad.Bot.Components
 
             if (IsUserInPRoom(Context, user) && IsUserOwner(user))
             {
-                
+                // TODO: waiting for Discord API devs updates select menus(not sure)
+                //var connectedUsers = Context.Guild.GetVoiceChannel(user.VoiceChannel.Id).ConnectedUsers;
+
+                var selectMenus = new SelectMenuBuilder(customId: "portal.Kick.Select:*",
+                                                        placeholder: "Select member to kick",
+                                                        minValues: 1, maxValues: 1)
+                    .WithType(ComponentType.UserSelect)
+                    .WithDefaultValues(SelectMenuDefaultValue.FromUser(user));
+                  //.WithUserTypes(connectedUsers);
+
+                var components = new ComponentBuilder()
+                    .WithSelectMenu(selectMenus);
+
+                await RespondAsync(components: components.Build(), ephemeral: true);
             }
         }
 
@@ -128,7 +139,20 @@ namespace Squad.Bot.Components
 
             if (IsUserInPRoom(Context, user) && IsUserOwner(user))
             {
+                // TODO: waiting for Discord API devs updates select menus(not sure)
+                //var connectedUsers = Context.Guild.GetVoiceChannel(user.VoiceChannel.Id).ConnectedUsers;
 
+                var selectMenus = new SelectMenuBuilder(customId: "portal.Owner.Select",
+                                                        placeholder: "Select new channel owner",
+                                                        minValues: 1, maxValues: 1,
+                                                        defaultValues: [SelectMenuDefaultValue.FromUser(user)])
+                    .WithType(ComponentType.UserSelect);
+                    //.WithUserTypes(connectedUsers);
+
+                var components = new ComponentBuilder()
+                    .WithSelectMenu(selectMenus);
+
+                await RespondAsync(components: components.Build(), ephemeral: true);
             }
         }
 
@@ -217,7 +241,7 @@ namespace Squad.Bot.Components
 
             if (IsUserInPRoom(Context, user) && IsUserOwner(user))
             {
-                await RespondWithModalAsync<RenameModal>("RenameModal");
+                await RespondWithModalAsync<RenameModal>("renameModal");
             }
             else
             {
@@ -232,11 +256,17 @@ namespace Squad.Bot.Components
             }
         }
 
+        [ComponentInteraction("portal.Owner.Select")]
+        public async Task OwnerSelect(IUser user)
+        {
+            await Logger.LogInfo($"new owner {user.Username}");
+            return;
+        }
+
         [ModalInteraction("renameModal")]
         public async Task RenameModalInteraction(RenameModal modal)
         {
-
-            await Context.Guild.CurrentUser.VoiceChannel.ModifyAsync(x => x.Name = modal.ChannelName);
+            await Context.Guild.GetUser(Context.User.Id).VoiceChannel.ModifyAsync(x => x.Name = modal.ChannelName);
 
             var embed = new EmbedBuilder
             {
@@ -250,7 +280,26 @@ namespace Squad.Bot.Components
         [ModalInteraction("changeLimit")]
         public async Task ChangeLimitInteraction(LimitModal modal)
         {
-            await Context.Guild.CurrentUser.VoiceChannel.ModifyAsync(x => x.UserLimit = modal.Limit);
+            short numberLimit = 5;
+            try
+            {
+                numberLimit = Convert.ToInt16(modal.Limit);
+            }
+            catch (Exception ex)
+            {
+                await Logger.LogException(ex, "Limit type conversion error");
+                var embedError = new EmbedBuilder
+                {
+                    Title = "Error",
+                    Description = "Not a number in limit input",
+                    Color = CustomColors.Failure,
+                };
+
+                await RespondAsync(embed: embedError.Build(), ephemeral: true);
+                return;
+            }
+
+            await Context.Guild.GetUser(Context.User.Id).VoiceChannel.ModifyAsync(x => x.UserLimit = numberLimit);
 
             var embed = new EmbedBuilder
             {
@@ -295,7 +344,7 @@ namespace Squad.Bot.Components
             [RequiredInput]
             [InputLabel("New limit")]
             [ModalTextInput("limit.new_limit", maxLength: 2)]
-            public int Limit { get; set; }
+            public string Limit { get; set; } = null!;
         }
     }
 }
