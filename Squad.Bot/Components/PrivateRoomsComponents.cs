@@ -6,6 +6,8 @@ using Squad.Bot.Data;
 using Squad.Bot.Logging;
 using Squad.Bot.Utilities;
 using System.Diagnostics;
+using LogMessageDiscord = Discord.LogMessage;
+using LogTypeDiscord = Discord.LogSeverity;
 
 namespace Squad.Bot.Components
 {
@@ -50,13 +52,13 @@ namespace Squad.Bot.Components
             await RespondAsync(embed: embed.Build(), ephemeral: true);
         }
 
-        // TODO: Change the stubs with the working code(need to learn Modals)
+        // TODO: Untested code
+
         [ComponentInteraction("portal.hide")]
         public async Task Hide()
         {
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            // TODO: Fill embeds with information
             if (IsUserInPRoom(Context, user) && IsUserOwner(user))
             {
                 var everyoneRole = Context.Guild.Roles.First(x => x.IsEveryone);
@@ -118,7 +120,7 @@ namespace Squad.Bot.Components
                 // TODO: waiting when Discord API devs updates select menus(not sure)
                 //var connectedUsers = Context.Guild.GetVoiceChannel(user.VoiceChannel.Id).ConnectedUsers;
 
-                var selectMenus = new SelectMenuBuilder(customId: "portal.Kick.Select:*",
+                var selectMenus = new SelectMenuBuilder(customId: "portal.Kick.Select",
                                                         placeholder: "Select member to kick",
                                                         minValues: 1, maxValues: 1)
                     .WithType(ComponentType.UserSelect)
@@ -257,10 +259,156 @@ namespace Squad.Bot.Components
         }
 
         [ComponentInteraction("portal.Owner.Select")]
-        public async Task OwnerSelect(IUser user)
+        public async Task OwnerSelect(string[] selectedUsers)
         {
-            await Logger.LogInfo($"new owner {user.Username}");
-            return;
+            var user = Context.Guild.GetUser(Context.User.Id);
+
+            if (IsUserInPRoom(Context, user) && IsUserOwner(user))
+            {
+                ulong selectedUserId;
+                try
+                {
+                    selectedUserId = Convert.ToUInt64(selectedUsers.First());
+                }
+                catch (Exception ex)
+                {
+                    await Logger.LogDiscord(new LogMessageDiscord(severity: LogTypeDiscord.Error, source: "", message: "", exception: ex));
+
+                    var embed = new EmbedBuilder
+                    {
+                        Title = "Error",
+                        Description = "Oooppss, something went wrong...",
+                        Color = CustomColors.Failure,
+                    }
+                    .WithAuthor(Context.User)
+                    .AddField(name: "This could be due to the fact that discord broke something... or update)", value: ex.Message + ex.GetType());
+
+                    await RespondAsync(embed: embed.Build(), ephemeral: true);
+                    return;
+                }
+
+                var voiceChannel = Context.Guild.GetVoiceChannel(user.VoiceChannel.Id);
+                var connectedUsers = voiceChannel.ConnectedUsers.ToHashSet();
+                var selectedUser = Context.Guild.GetUser(selectedUserId);
+
+                if (selectedUserId != user.Id && connectedUsers.Contains(selectedUser))
+                {
+                    var oldChannelPermissions = user.VoiceChannel.GetPermissionOverwrite(user) ?? new();
+
+                    oldChannelPermissions = oldChannelPermissions.Modify(muteMembers: PermValue.Inherit,
+                                                                         manageChannel: PermValue.Inherit);
+
+                    var newChannelPermissions = user.VoiceChannel.GetPermissionOverwrite(selectedUser) ?? new();
+
+                    newChannelPermissions = newChannelPermissions.Modify(muteMembers: PermValue.Allow,
+                                                                         manageChannel: PermValue.Allow);
+
+                    await user.VoiceChannel.AddPermissionOverwriteAsync(user, oldChannelPermissions);
+                    await user.VoiceChannel.AddPermissionOverwriteAsync(selectedUser, newChannelPermissions);
+
+                    var embed = new EmbedBuilder
+                    {
+                        Title = "Owner change success",
+                        Description = $"New owner is {selectedUser.DisplayName ?? selectedUser.Username}",
+                        Color = CustomColors.Success,
+                    }.WithAuthor(selectedUser);
+
+                    await RespondAsync(embed: embed.Build(), ephemeral: true);
+                }
+                else
+                {
+                    var embed = new EmbedBuilder
+                    {
+                        Title = "Owner change failure",
+                        Description = "The selected user is currently the owner or the selected user is not in a private room",
+                        Color = CustomColors.Failure,
+                    };
+
+                    await RespondAsync(embed: embed.Build(), ephemeral: true);
+                }
+            }
+            else
+            {
+                var embed = new EmbedBuilder
+                {
+                    Title = "Oooppss, something went wrong...",
+                    Description = "This could be due to the fact that you are not in a private room or not the owner",
+                    Color = CustomColors.Failure,
+                };
+
+                await RespondAsync(embed: embed.Build(), ephemeral: true);
+            }
+        }
+
+        [ComponentInteraction("portal.Kick.Select")]
+        public async Task KickSelect(string[] selectedUsers)
+        {
+            var user = Context.Guild.GetUser(Context.User.Id);
+
+            if (IsUserInPRoom(Context, user) && IsUserOwner(user))
+            {
+                ulong selectedUserId;
+                try
+                {
+                    selectedUserId = Convert.ToUInt64(selectedUsers.First());
+                }
+                catch (Exception ex)
+                {
+                    await Logger.LogDiscord(new LogMessageDiscord(severity: LogTypeDiscord.Error, source: "", message: "", exception: ex));
+
+                    var embed = new EmbedBuilder
+                    {
+                        Title = "Error",
+                        Description = "Oooppss, something went wrong...",
+                        Color = CustomColors.Failure,
+                    }
+                    .WithAuthor(Context.User)
+                    .AddField(name: "This could be due to the fact that discord broke something... or update)", value: ex.Message + ex.GetType());
+
+                    await RespondAsync(embed: embed.Build(), ephemeral: true);
+                    return;
+                }
+
+                var voiceChannel = Context.Guild.GetVoiceChannel(user.VoiceChannel.Id);
+                var connectedUsers = voiceChannel.ConnectedUsers.ToHashSet();
+                var selectedUser = Context.Guild.GetUser(selectedUserId);
+
+                if (selectedUserId != user.Id && connectedUsers.Contains(selectedUser))
+                {
+                    await selectedUser.ModifyAsync(x => x.Channel = null);
+
+                    var embed = new EmbedBuilder
+                    {
+                        Title = "Kick user success",
+                        Description = $"{selectedUser.DisplayName ?? selectedUser.Username}'s was kicked from your private channel",
+                        Color = CustomColors.Success,
+                    }.WithAuthor(selectedUser);
+
+                    await RespondAsync(embed: embed.Build(), ephemeral: true);
+                }
+                else
+                {
+                    var embed = new EmbedBuilder
+                    {
+                        Title = "Kick user failure",
+                        Description = "The selected user is currently the owner or the selected user is not in a private room",
+                        Color = CustomColors.Failure,
+                    };
+
+                    await RespondAsync(embed: embed.Build(), ephemeral: true);
+                }
+            }
+            else
+            {
+                var embed = new EmbedBuilder
+                {
+                    Title = "Oooppss, something went wrong...",
+                    Description = "This could be due to the fact that you are not in a private room or not the owner",
+                    Color = CustomColors.Failure,
+                };
+
+                await RespondAsync(embed: embed.Build(), ephemeral: true);
+            }
         }
 
         [ModalInteraction("renameModal")]
