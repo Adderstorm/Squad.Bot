@@ -115,7 +115,7 @@ namespace Squad.Bot.Components
 
             if (IsUserInPRoom(Context, user) && IsUserOwner(user))
             {
-                // TODO: waiting for Discord API devs updates select menus(not sure)
+                // TODO: waiting when Discord API devs updates select menus(not sure)
                 //var connectedUsers = Context.Guild.GetVoiceChannel(user.VoiceChannel.Id).ConnectedUsers;
 
                 var selectMenus = new SelectMenuBuilder(customId: "portal.Kick.Select:*",
@@ -139,7 +139,7 @@ namespace Squad.Bot.Components
 
             if (IsUserInPRoom(Context, user) && IsUserOwner(user))
             {
-                // TODO: waiting for Discord API devs updates select menus(not sure)
+                // TODO: waiting when Discord API devs updates select menus(not sure)
                 //var connectedUsers = Context.Guild.GetVoiceChannel(user.VoiceChannel.Id).ConnectedUsers;
 
                 var selectMenus = new SelectMenuBuilder(customId: "portal.Owner.Select",
