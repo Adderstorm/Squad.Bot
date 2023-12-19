@@ -428,10 +428,10 @@ namespace Squad.Bot.Components
         [ModalInteraction("changeLimit")]
         public async Task ChangeLimitInteraction(LimitModal modal)
         {
-            short numberLimit = 5;
+            ushort numberLimit = 5;
             try
             {
-                numberLimit = Convert.ToInt16(modal.Limit);
+                numberLimit = Convert.ToUInt16(modal.Limit);
             }
             catch (Exception ex)
             {
@@ -439,7 +439,7 @@ namespace Squad.Bot.Components
                 var embedError = new EmbedBuilder
                 {
                     Title = "Error",
-                    Description = "Not a number in limit input",
+                    Description = "Not a number in limit input ro negative number",
                     Color = CustomColors.Failure,
                 };
 
