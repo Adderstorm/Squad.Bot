@@ -7,10 +7,10 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Squad.bot/Squad.Bot.csproj", "Squad.bot/"]
-RUN dotnet restore "./Squad.bot/./Squad.Bot.csproj"
+COPY ["Squad.Bot/Squad.Bot.csproj", "Squad.Bot/"]
+RUN dotnet restore "./Squad.Bot/Squad.Bot.csproj"
 COPY . .
-WORKDIR "/src/Squad.bot"
+WORKDIR "/src/Squad.Bot"
 RUN dotnet build "./Squad.Bot.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
@@ -19,6 +19,7 @@ RUN dotnet publish "./Squad.Bot.csproj" -c $BUILD_CONFIGURATION -o /app/publish 
 
 FROM base AS final
 WORKDIR /app
-ADD Squad.Bot/appsettings.json /app
+copy ["Squad.Bot/appsettings.json", "/app/"]
+copy ["Squad.Bot/SquadDb.db", "/app/"]
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Squad.Bot.dll"]
