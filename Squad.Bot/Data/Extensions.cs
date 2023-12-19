@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Squad.Bot.Logging;
 using Squad.Bot.Models.AI;
 using Squad.Bot.Models.Base;
 
@@ -19,10 +20,14 @@ namespace Squad.Bot.Data
 
                     var guild = new Guilds { Id = 909801532126543874, ServerName = "Squad" };
 
-                    if(context.Guilds.First(x => x.Id == 909801532126543874).ServerName == string.Empty)
+                    try
                     {
                         context.Guilds.Add(guild);
                         context.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogException(ex, ex.Message);
                     }
                 }
 #pragma warning restore IDE0063 // Использовать простой оператор using

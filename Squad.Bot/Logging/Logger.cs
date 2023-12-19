@@ -185,12 +185,12 @@ namespace Squad.Bot.Logging
         // TODO: Create file logging system
         private static void LogToFile(this LogMessage logMessage)
         {
-            ArgumentNullException.ThrowIfNull(logMessage);
+            //ArgumentNullException.ThrowIfNull(logMessage);
         }
 
         private static void LogToFile(this LogMessageDiscord logMessage)
         {
-            throw new NotImplementedException(nameof(logMessage));
+            //throw new NotImplementedException(nameof(logMessage));
         }
     }
 }
