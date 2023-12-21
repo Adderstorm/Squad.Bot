@@ -5,16 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using Squad.Bot.Data;
 using Squad.Bot.Logging;
 using Squad.Bot.Utilities;
-using System.Diagnostics;
-using LogMessageDiscord = Discord.LogMessage;
-using LogTypeDiscord = Discord.LogSeverity;
 
 namespace Squad.Bot.Components
 {
-    public class PrivateRoomsComponents(SquadDBContext dbContext) : InteractionModuleBase<SocketInteractionContext>
+    public class PrivateRoomsComponents(SquadDBContext dbContext, Logger logger) : InteractionModuleBase<SocketInteractionContext>
     {
 
         private readonly SquadDBContext _dbContext = dbContext;
+        private readonly Logger _logger = logger;
 
         [ComponentInteraction("portal.delete")]
         public async Task Delete()
@@ -272,7 +270,7 @@ namespace Squad.Bot.Components
                 }
                 catch (Exception ex)
                 {
-                    await Logger.LogDiscord(new LogMessageDiscord(severity: LogTypeDiscord.Error, source: "", message: "", exception: ex));
+                    _logger.LogError(message: "An error occurred while converting string to int from discord's interaction.({funcname})", ex: ex, "OwnerSelect");
 
                     var embed = new EmbedBuilder
                     {
@@ -354,7 +352,7 @@ namespace Squad.Bot.Components
                 }
                 catch (Exception ex)
                 {
-                    await Logger.LogDiscord(new LogMessageDiscord(severity: LogTypeDiscord.Error, source: "", message: "", exception: ex));
+                    _logger.LogError(message: "An error occurred while converting string to int from discord's interaction.({funcname})", ex: ex, "KickSelect");
 
                     var embed = new EmbedBuilder
                     {
@@ -433,9 +431,8 @@ namespace Squad.Bot.Components
             {
                 numberLimit = Convert.ToUInt16(modal.Limit);
             }
-            catch (Exception ex)
+            catch
             {
-                await Logger.LogException(ex, "Limit type conversion error");
                 var embedError = new EmbedBuilder
                 {
                     Title = "Error",

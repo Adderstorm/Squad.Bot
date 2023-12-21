@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Microsoft.Extensions.Logging;
 using Squad.Bot.Logging;
 using Squad.Bot.Utilities;
 
@@ -11,6 +12,14 @@ namespace Squad.Bot.Commands
     [Group("moderation", "commands for moderators")]
     public class Moderation : InteractionModuleBase<SocketInteractionContext>
     {
+        private readonly Logger _logger;
+
+        public Moderation(Logger logger)
+        {
+            _logger = logger;
+        }
+
+
         /// <summary>
         /// Kicks a user from the server.
         /// </summary>
@@ -61,7 +70,7 @@ namespace Squad.Bot.Commands
                 }
                 catch (Exception ex)
                 {
-                    await Logger.LogException(ex);
+                    _logger.LogError(message: "An error occurred while trying to kick the user.({funcname})", ex: ex, "KickUser");
                     var embed = new EmbedBuilder
                     {
                         Title = "Error!",
@@ -108,7 +117,7 @@ namespace Squad.Bot.Commands
             }
             catch (Exception ex)
             {
-                await Logger.LogException(ex);
+                _logger.LogError(message: "An error occurred while trying to change the nickname of the user.({funcname})", ex: ex, "NickChange");
                 var embed = new EmbedBuilder
                 {
                     Title = "Error!",
@@ -171,7 +180,7 @@ namespace Squad.Bot.Commands
                 }
                 catch (Exception ex)
                 {
-                    await Logger.LogException(ex);
+                    _logger.LogError(message: "An error occurred while trying to bun the user.({funcname})", ex: ex, "BanUser");
                     var embed = new EmbedBuilder
                     {
                         Title = "Error!",

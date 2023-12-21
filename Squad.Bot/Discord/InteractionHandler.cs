@@ -22,6 +22,7 @@ namespace Squad.Bot.Discord
         private readonly InteractionService _handler;
         private readonly IServiceProvider _services;
         private readonly IConfiguration _configuration;
+        private readonly Logger _logger;
 
         /// <summary>
         /// Constructs a new instance of the InteractionHandler class.
@@ -30,12 +31,13 @@ namespace Squad.Bot.Discord
         /// <param name="handler">The InteractionService used to register modules.</param>
         /// <param name="services">The service provider used to resolve dependencies.</param>
         /// <param name="configuration">The configuration used to read bot settings.</param>
-        public InteractionHandler(DiscordSocketClient client, InteractionService handler, IServiceProvider services, IConfiguration configuration)
+        public InteractionHandler(DiscordSocketClient client, InteractionService handler, IServiceProvider services, IConfiguration configuration, Logger logger)
         {
             _client = client;
             _handler = handler;
             _services = services;
             _configuration = configuration;
+            _logger = logger;
         }
 
         /// <summary>
@@ -45,9 +47,9 @@ namespace Squad.Bot.Discord
         {
             // Initialize the handler and services for communication with the server
 
-            UserGuildEvent userGuildEvent = new (_services.GetRequiredService<SquadDBContext>());
-            UserMessages userMessages = new (_services.GetRequiredService<SquadDBContext>());
-            OnUserStateChange userStateChange = new (_services.GetRequiredService<SquadDBContext>());
+            UserGuildEvent userGuildEvent = new (_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
+            UserMessages userMessages = new (_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
+            OnUserStateChange userStateChange = new (_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
 
             // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService
             await _handler.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
@@ -92,7 +94,7 @@ namespace Squad.Bot.Discord
             }
             catch (Exception? ex)
             {
-                await Logger.LogException(ex, ex.Message);
+                _logger.LogError(message: ex.Message, ex: ex);
 #pragma warning disable CS8604 // Possible null reference argument.
                 Console.WriteLine(ex.StackTrace, ex.Source);
 #pragma warning restore CS8604 // Possible null reference argument.

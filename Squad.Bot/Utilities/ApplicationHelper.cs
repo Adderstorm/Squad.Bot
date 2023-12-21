@@ -6,9 +6,6 @@ namespace Squad.Bot.Utilities
     {
         public static void AnnounceAndExit()
         {
-            Logger.LogInfo("Awaiting all log tasks...");
-            Task.WhenAll(Logger.LogTasks).GetAwaiter().GetResult();
-            Logger.LogInfo("Application closing safely...");
             Environment.Exit(0);
         }
     }

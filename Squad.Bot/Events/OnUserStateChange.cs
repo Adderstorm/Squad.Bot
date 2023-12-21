@@ -12,23 +12,24 @@ namespace Squad.Bot.Events
     {
 
         private readonly SquadDBContext _dbContext;
+        private readonly Logger _logger;
 
-        public OnUserStateChange(SquadDBContext dbContext) 
+        public OnUserStateChange(SquadDBContext dbContext, Logger logger) 
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public async Task OnUserVoiceStateUpdate(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)
         {
-            await Logger.LogEvent($"{nameof(OnUserStateChange)} has been executed by {user.Username}, {nameof(oldState)}: {oldState.VoiceChannel?.Id}, {nameof(newState)}: {newState.VoiceChannel?.Id}");
             await PrivateRooms(user, oldState, newState);
             await CollectData(user, oldState, newState);
         }
 
         // TODO: Change the stub with the working code and !!!(if need) delete static field in CollectData
-        private static async Task CollectData(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)
+        private async Task CollectData(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)
         {
-            await Logger.LogInfo($"{user}, {newState}, {oldState}");
+            _logger.LogInfo("{user}, {newState}, {oldState}", user, newState, oldState);
         }
 
         private async Task PrivateRooms(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)
