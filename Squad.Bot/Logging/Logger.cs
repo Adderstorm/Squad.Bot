@@ -1,196 +1,70 @@
-﻿using LogMessageDiscord = Discord.LogMessage;
-using LogTypeDiscord = Discord.LogSeverity;
+﻿using Discord;
+using Microsoft.Extensions.Logging;
 
 namespace Squad.Bot.Logging
 {
-    /// <summary>
-    /// Provides a set of static methods for logging messages to the console.
-    /// </summary>
-    public static class Logger
+    public class Logger
     {
-        /// <summary>
-        /// A list of tasks that are currently running for logging.
-        /// </summary>
-        public static List<Task> LogTasks { get; set; } = [];
+        private readonly ILogger<Logger> _logger;
 
-        private static readonly string filePath = Path.Combine(Directory.GetCurrentDirectory(), "logData.txt");
-
-        /// <summary>
-        /// A lock object for synchronizing access to the <see cref="LogTasks"/> list.
-        /// </summary>
-        private static readonly object _lock = new();
-
-        /// <summary>
-        /// Logs a message of type <see cref="LogType.CommandExecuted"/> to the console.
-        /// </summary>
-        /// <param name="message">The message to log.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        public static Task LogCommand(string message) => LogToConsole(new LogMessage(LogType.CommandExecuted, message));
-
-        /// <summary>
-        /// Logs a message of type <see cref="LogType.Exception"/> to the console.
-        /// </summary>
-        /// <param name="exception">The exception to log.</param>
-        /// <param name="message">An optional message to include with the exception.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        public static Task LogException(Exception exception, string? message = null) => LogToConsole(new LogMessage(LogType.Exception, message ?? "No extra information.", exception));
-
-        /// <summary>
-        /// Logs a message of type <see cref="LogType.EventRegistered"/> to the console.
-        /// </summary>
-        /// <param name="message">The message to log.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        public static Task LogEvent(string message) => LogToConsole(new LogMessage(LogType.EventRegistered, message));
-
-        /// <summary>
-        /// Logs a message of type <see cref="LogType.Info"/> to the console.
-        /// </summary>
-        /// <param name="message">The message to log.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        public static Task LogInfo(string message) => LogToConsole(new LogMessage(LogType.Info, message));
-
-        /// <summary>
-        /// Logs a message of type <see cref="LogType.DataBase"/> to the console.
-        /// </summary>
-        /// <param name="message">The message to log.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        public static Task LogDBInfo(string message) => LogToConsole(new LogMessage(LogType.DataBase, message));
-
-        /// <summary>
-        /// Logs a message to the Discord logging system.
-        /// </summary>
-        /// <param name="message">The message to log.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        public static Task LogDiscord(LogMessageDiscord message) => LogToConsole(message);
-
-        /// <summary>
-        /// Logs a message to the console.
-        /// </summary>
-        /// <param name="logMessage">The message to log.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        private static Task LogToConsole(LogMessage logMessage)
+        public Logger(ILogger<Logger> logger)
         {
-            // Fire and forget
-            LogTasks.Add(Task.Run(() =>
-            {
-                lock (_lock)
-                {
-                    PrintSeverityPrefix(logMessage.Severity);
-                    Console.WriteLine($" - {logMessage.Message}");
+            _logger = logger;
+        }
 
-                    if (logMessage.HasException)
-                    {
-                        Console.WriteLine();
-                        Console.WriteLine(logMessage.Exception.Message);
-                        Console.WriteLine(logMessage.Exception.StackTrace ?? "No extra StackTrace");
-                        Console.WriteLine(logMessage.Exception.Source ?? "No extra Source information");
-                        if(logMessage.Severity == LogType.Exception)
-                        {
-                            // TODO: Register and send message about errors here
-                            logMessage.LogToFile();
-                        }
-                    }
+        public void LogInfo(string? message, params object?[] args)
+        {
+            _logger.LogInformation(message: message, args: args);
+        }
 
-                    LogTasks = LogTasks.Where(x => !x.IsCanceled && !x.IsCompleted && !x.IsCompletedSuccessfully && !x.IsFaulted).ToList();
-                }
-            }));
+        public void LogWarning(string? message, params object?[] args)
+        {
+            _logger.LogWarning(message: message, args: args);
+        }
+
+        public void LogError(string? message, Exception? ex, params object?[] args)
+        {
+            _logger.LogError(message: message, exception: ex, args: args);
+        }
+
+        public void LogCritical(string? message, Exception? ex, params object?[] args)
+        {
+            _logger.LogCritical(message: message, exception: ex, args: args);
+        }
+
+        public void LogTrace(string? message, Exception? ex, params object?[] args)
+        {
+            _logger.LogTrace(message: message, exception: ex, args: args);
+        }
+
+        public void LogDebug(string? message, params object?[] args)
+        {
+            _logger.LogDebug(message: message, args: args);
+        }
+
+        public Task LogDiscord(LogMessage message)
+        {
+            switch(message.Severity) {
+                case LogSeverity.Critical:
+                    LogCritical(message.Message, message.Exception, message.Source);
+                    break;
+                case LogSeverity.Error:
+                    LogError(message.Message, message.Exception, message.Source);
+                    break;
+                case LogSeverity.Warning:
+                    LogWarning(message.Message, message.Source);
+                    break;
+                case LogSeverity.Info:
+                    LogInfo(message.Message, message.Source);
+                    break;
+                case LogSeverity.Verbose:
+                    LogTrace(message.Message, message.Exception, message.Source);
+                    break;
+                case LogSeverity.Debug:
+                    LogDebug(message.Message, message.Source);
+                    break;
+            }
             return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Logs a message to the console.
-        /// </summary>
-        /// <param name="logMessage">The message to log.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        private static Task LogToConsole(LogMessageDiscord logMessage)
-        {
-            // Fire and forget
-            LogTasks.Add(Task.Run(() =>
-            {
-                lock (_lock)
-                {
-                    Console.Write($"{logMessage.Source} ");
-                    PrintSeverityPrefix(logMessage.Severity);
-                    Console.WriteLine($" - {logMessage.Message}");
-
-                    if (logMessage.Exception != null)
-                    {
-                        Console.WriteLine();
-                        Console.WriteLine(logMessage.Exception.Message);
-                        Console.WriteLine(logMessage.Exception.StackTrace ?? "No extra StackTrace");
-                        Console.WriteLine(logMessage.Exception.Source ?? "No extra Source information");
-                    }
-
-                    if(logMessage.Severity <= LogTypeDiscord.Warning)
-                    {
-                        // TODO: Register and send message about errors here
-                        logMessage.LogToFile();
-                    }
-
-                    LogTasks = LogTasks.Where(x => !x.IsCanceled && !x.IsCompleted && !x.IsCompletedSuccessfully && !x.IsFaulted).ToList();
-                }
-            }));
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Prints a prefix for the given log severity to the console.
-        /// </summary>
-        /// <param name="severity">The severity of the log message.</param>
-        private static void PrintSeverityPrefix(LogType severity)
-        {
-            // Looks like '[Info]' but adds color to the inner text, and restores the old color
-            Console.Write("[");
-            var oldColor = Console.ForegroundColor;
-            var severityColor = severity switch
-            {
-                LogType.Exception => ConsoleColor.Red,
-                LogType.CommandExecuted => ConsoleColor.DarkBlue,
-                LogType.EventRegistered => ConsoleColor.DarkBlue,
-                LogType.Info => ConsoleColor.DarkYellow,
-                LogType.DataBase => ConsoleColor.DarkMagenta,
-                _ => throw new NotImplementedException("That log type doesn't exist"),
-            };
-            Console.ForegroundColor = severityColor;
-            Console.Write(severity.ToString());
-            Console.ForegroundColor = oldColor;
-            Console.Write("]");
-        }
-
-        /// <summary>
-        /// Prints a prefix for the given log severity to the console.
-        /// </summary>
-        /// <param name="severity">The severity of the log message.</param>
-        private static void PrintSeverityPrefix(LogTypeDiscord severity)
-        {
-            // Looks like '[Info]' but adds color to the inner text, and restores the old color
-            Console.Write("[");
-            var oldColor = Console.ForegroundColor;
-            var severityColor = severity switch
-            {
-                LogTypeDiscord.Error => ConsoleColor.Red,
-                LogTypeDiscord.Info => ConsoleColor.DarkYellow,
-                LogTypeDiscord.Critical => ConsoleColor.DarkRed,
-                LogTypeDiscord.Warning => ConsoleColor.DarkYellow,
-                LogTypeDiscord.Verbose => ConsoleColor.DarkRed,
-                LogTypeDiscord.Debug => ConsoleColor.DarkYellow,
-                _ => throw new NotImplementedException("That log type doesn't exist"),
-            };
-            Console.ForegroundColor = severityColor;
-            Console.Write(severity.ToString());
-            Console.ForegroundColor = oldColor;
-            Console.Write("]");
-        }
-
-        // TODO: Create file logging system
-        private static void LogToFile(this LogMessage logMessage)
-        {
-            //ArgumentNullException.ThrowIfNull(logMessage);
-        }
-
-        private static void LogToFile(this LogMessageDiscord logMessage)
-        {
-            //throw new NotImplementedException(nameof(logMessage));
         }
     }
 }
