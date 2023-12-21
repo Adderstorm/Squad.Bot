@@ -19,7 +19,7 @@ namespace Squad.Bot.Events
         // TODO: Change the stubs with the working code
         public async Task OnUserMessageReceived(SocketMessage message)
         {
-            _logger.LogDebug("{nameof(OnUserMessageReceived)} has been executed by {message.Author.Username}:{message.Author.Id} in {message.Channel.Id} channel", nameof(OnUserMessageReceived), message.Author.Username, message.Channel.Id);
+            _logger.LogDebug("{nameOfFunc} has been executed by {Author.Username}:{Author.Id} in {Channel.Id} channel", nameof(OnUserMessageReceived), message.Author.Username, message.Author.Id, message.Channel.Id);
         }
     }
 }

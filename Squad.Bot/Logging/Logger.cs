@@ -17,9 +17,9 @@ namespace Squad.Bot.Logging
             _logger.LogInformation(message: message, args: args);
         }
 
-        public void LogWarning(string? message, params object?[] args)
+        public void LogWarning(string? message, Exception? ex, params object?[] args)
         {
-            _logger.LogWarning(message: message, args: args);
+            _logger.LogWarning(message: message, exception: ex, args: args);
         }
 
         public void LogError(string? message, Exception? ex, params object?[] args)
@@ -52,7 +52,7 @@ namespace Squad.Bot.Logging
                     LogError(message.Message, message.Exception, message.Source);
                     break;
                 case LogSeverity.Warning:
-                    LogWarning(message.Message, message.Source);
+                    LogWarning(message.Message, ex: message.Exception, message.Source);
                     break;
                 case LogSeverity.Info:
                     LogInfo(message.Message, message.Source);

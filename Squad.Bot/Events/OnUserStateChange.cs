@@ -41,6 +41,11 @@ namespace Squad.Bot.Events
                 savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == oldState.VoiceChannel.Guild.Id);
             else
                 savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == newState.VoiceChannel.Guild.Id);
+
+            if(savedPortal == null) 
+            {
+                return;
+            }
             
             if (newState.VoiceChannel != null && oldState.VoiceChannel != null && newState.VoiceChannel.Id == savedPortal.ChannelID && oldState.VoiceChannel.Category.Id == savedPortal.CategoryID && IsUserOwner(oldState, user))
             {

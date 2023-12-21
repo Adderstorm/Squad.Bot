@@ -18,13 +18,14 @@ namespace Squad.Bot.Data
                     var context = services.GetRequiredService<SquadDBContext>();
                     context.Database.EnsureCreated();
 
-                    var guild = new Guilds { Id = 909801532126543874, ServerName = "Squad" };
 
-                    if (context.Guilds.Contains(guild))
+                    if (context.Guilds.Any())
                     {
-                        context.Guilds.Add(guild);
-                        context.SaveChanges();
+                        return;
                     }
+                    var guild = new Guilds { Id = 909801532126543874, ServerName = "Squad" };
+                    context.Guilds.Add(guild);
+                    context.SaveChanges();
                 }
 #pragma warning restore IDE0063 // Использовать простой оператор using
             }
