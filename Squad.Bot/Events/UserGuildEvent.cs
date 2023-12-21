@@ -9,20 +9,22 @@ namespace Squad.Bot.Events
     {
 
         private readonly SquadDBContext _dbContext;
+        private readonly Logger _logger;
 
-        public UserGuildEvent(SquadDBContext dbContext)
+        public UserGuildEvent(SquadDBContext dbContext, Logger logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         // TODO: Change the stubs with the working code
         public async Task OnUserLeftGuild(SocketGuild guild, SocketUser user)
         {
-            await Logger.LogEvent($"{nameof(OnUserLeftGuild)} has been executed by {user.Username} in {guild.Id}");
+            _logger.LogDebug("{nameof(OnUserLeftGuild)} has been executed by {user.Username} in {guild.Id}", nameof(OnUserLeftGuild), user.Username, guild.Id);
         }
         public async Task OnUserJoinGuild(SocketGuildUser user)
         {
-            await Logger.LogEvent($"{nameof(OnUserJoinGuild)} has been executed by {user.Username} in {user.Guild.Id}");
+            _logger.LogDebug("{nameof(OnUserJoinGuild)} has been executed by {user.Username} in {user.Guild.Id}", nameof(OnUserJoinGuild), user.Username, user.Guild.Id);
         }
     }
 }

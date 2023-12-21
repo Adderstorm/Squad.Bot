@@ -20,14 +20,10 @@ namespace Squad.Bot.Data
 
                     var guild = new Guilds { Id = 909801532126543874, ServerName = "Squad" };
 
-                    try
+                    if (context.Guilds.Contains(guild))
                     {
                         context.Guilds.Add(guild);
                         context.SaveChanges();
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.LogException(ex, ex.Message);
                     }
                 }
 #pragma warning restore IDE0063 // Использовать простой оператор using

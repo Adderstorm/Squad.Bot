@@ -8,16 +8,18 @@ namespace Squad.Bot.Events
     {
 
         private readonly SquadDBContext _dbContext;
+        private readonly Logger _logger;
 
-        public UserMessages(SquadDBContext dbContext)
+        public UserMessages(SquadDBContext dbContext, Logger logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         // TODO: Change the stubs with the working code
         public async Task OnUserMessageReceived(SocketMessage message)
         {
-            await Logger.LogEvent($"{nameof(OnUserMessageReceived)} has been executed by {message.Author.Username}:{message.Author.Id} in {message.Channel.Id} channel");
+            _logger.LogDebug("{nameof(OnUserMessageReceived)} has been executed by {message.Author.Username}:{message.Author.Id} in {message.Channel.Id} channel", nameof(OnUserMessageReceived), message.Author.Username, message.Channel.Id);
         }
     }
 }
