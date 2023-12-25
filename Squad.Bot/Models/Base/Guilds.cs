@@ -17,6 +17,8 @@ namespace Squad.Bot.Models.Base
 
         public ICollection<TotalMembers>? TotalMembers { get; set; }
 
-        public DateTime AddedAt { get; set; } = DateTime.Now;
+        public DateTime? DeletedAt { get; set; }
+
+        public DateTime AddedAt { get; set; } = DateTime.UtcNow;
     }
 }

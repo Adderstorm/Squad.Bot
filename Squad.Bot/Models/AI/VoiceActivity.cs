@@ -17,6 +17,6 @@ namespace Squad.Bot.Models.AI
         [Required]
         public int TotalMinutes { get; set; } = 0;
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

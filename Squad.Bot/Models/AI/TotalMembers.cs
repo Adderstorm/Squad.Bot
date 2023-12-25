@@ -8,14 +8,15 @@ namespace Squad.Bot.Models.AI
     public class TotalMembers
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
+        [Required]
         public Guilds Guilds { get; set; } = null!;
 
         [Required]
         public int TotalUsers { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

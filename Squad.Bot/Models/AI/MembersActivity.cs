@@ -17,6 +17,6 @@ namespace Squad.Bot.Models.AI
         [Required]
         public Guilds Guilds { get; set; } = null!;
 
-        public DateTime LastActivityDate { get; set; } = DateTime.Now;
+        public DateTime LastActivityDate { get; set; } = DateTime.UtcNow;
     }
 }

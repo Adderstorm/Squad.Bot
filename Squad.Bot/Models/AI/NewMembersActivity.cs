@@ -13,6 +13,6 @@ namespace Squad.Bot.Models.AI
         [Required]
         public NewMembers NewMembers { get; set; } = null!;
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

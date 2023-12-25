@@ -45,24 +45,33 @@ namespace Squad.Bot.Discord
         /// </summary>
         public async Task InitializeAsync()
         {
-            // Initialize the handler and services for communication with the server
 
+            #region service providers
+            // Initialize the handler and services for communication with the server
             UserGuildEvent userGuildEvent = new (_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
             UserMessages userMessages = new (_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
             OnUserStateChange userStateChange = new (_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
+            Guild guild = new(_services.GetRequiredService < SquadDBContext>(), _services.GetRequiredService<Logger>());
+            #endregion
 
             // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService
             await _handler.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
 
+            #region Interaction payloads
             // Process the InteractionCreated payloads to execute Interactions commands
             _client.InteractionCreated += HandleInteraction;
             _client.Ready += ReadyAsync;
+            #endregion
 
+            #region events
             // Subscribes for events
             _client.MessageReceived += userMessages.OnUserMessageReceived;
             _client.UserVoiceStateUpdated += userStateChange.OnUserVoiceStateUpdate;
             _client.UserLeft += userGuildEvent.OnUserLeftGuild;
             _client.UserJoined += userGuildEvent.OnUserJoinGuild;
+            _client.JoinedGuild += guild.OnGuildJoined;
+            _client.LeftGuild += guild.OnGuildLeft;
+            #endregion
 
             // Process the command execution results 
             _handler.InteractionExecuted += InteractionExecuted;

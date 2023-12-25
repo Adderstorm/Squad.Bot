@@ -105,7 +105,11 @@ namespace Squad.Bot
                 services.AddLogging(loggingBuilder =>
                 {
                     loggingBuilder.ClearProviders();
+#if Debug
                     loggingBuilder.SetMinimumLevel(LogLevel.Debug);
+#else
+                    loggingBuilder.SetMinimumLevel(LogLevel.Warning);
+#endif
                     loggingBuilder.AddNLog(_configuration);
                 });
 
