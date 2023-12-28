@@ -14,9 +14,6 @@ namespace Squad.Bot.Models.AI
         [Required]
         public Guilds Guilds { get; set; } = null!;
 
-        [Required]
-        public int TotalMessages { get; set; } = 0;
-
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

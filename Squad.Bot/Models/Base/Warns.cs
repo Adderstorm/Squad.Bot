@@ -16,7 +16,7 @@ namespace Squad.Bot.Models.Base
         [Required]
         public Guilds Guilds { get; set; } = null!;
 
-        public int ModeratorID { get; set; }
+        public ulong ModeratorID { get; set; }
 
         [Required(ErrorMessage = "You must to specify a reason")]
         [MaxLength(150)]
