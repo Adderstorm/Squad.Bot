@@ -364,4 +364,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
 /Squad.bot/appsettings.json
+/Squad.bot/appsettings.Development.json

@@ -20,7 +20,11 @@ namespace Squad.Bot
         /// </summary>
         private readonly IConfiguration _configuration = new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
+#if DEBUG
+            .AddJsonFile("appsettings.Development.json")
+#else
             .AddJsonFile("appsettings.json")
+#endif
             .Build();
 
         private DiscordSocketClient? _client;
@@ -44,8 +48,10 @@ namespace Squad.Bot
         /// <returns>A <see cref="Task"/> that represents the asynchronous running of the bot.</returns>
         private async Task RunAsync(IHost host)
         {
+#if DEBUG
             // Create db if not exists, lol
             host.CreateDbIfNotExists();
+#endif
 
             using IServiceScope serviceScope = host.Services.CreateAsyncScope();
             IServiceProvider services = serviceScope.ServiceProvider;
@@ -93,13 +99,20 @@ namespace Squad.Bot
                     // Set the AlwaysDownloadUsers property to true to enable automatic downloading of users that the bot interacts with
                     AlwaysDownloadUsers = true,
                     // Set the LogLevel property to Debug to enable debug-level logging
+#if DEBUG
                     LogLevel = LogSeverity.Debug,
+#else
+                    LogLevel = LogSeverity.Error,
+#endif
                     // Set the TotalShards property to the number of shards specified in appsettings.json
                     TotalShards = Convert.ToInt16(_configuration["BotSettings:TotalShards"])
                 }));
 
                 // Add custom logger class
                 services.AddTransient<Logger>();
+
+                // Add the SquadDBContext service to the service collection, using the provided connection string to configure the context
+                services.AddDbContext<SquadDBContext>(options => options.UseSqlite(_configuration["ConnectionStrings:DbConnection"]));
 
                 // Configure the NLog
                 services.AddLogging(loggingBuilder =>
@@ -112,9 +125,6 @@ namespace Squad.Bot
 #endif
                     loggingBuilder.AddNLog(_configuration);
                 });
-
-                // Add the SquadDBContext service to the service collection, using the provided connection string to configure the context
-                services.AddDbContext<SquadDBContext>(options => options.UseSqlite(_configuration["ConnectionStrings:DbConnection"]));
 
                 // Add the InteractionService service to the service collection, using the DiscordSocketClient service that was just added
                 services.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()));
