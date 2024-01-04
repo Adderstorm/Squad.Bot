@@ -26,7 +26,6 @@ namespace Squad.Bot.Data
         public DbSet<PeakOnline> PeakOnline { get; set; }
         public DbSet<TotalLeaves> TotalLeaves { get; set; }
         public DbSet<TotalMembers> TotalMembers { get; set; }
-        public DbSet<VoiceActivity> VoiceActivity { get; set; }
     }
 
 }
