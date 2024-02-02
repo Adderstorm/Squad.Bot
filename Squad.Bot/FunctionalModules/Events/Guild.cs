@@ -3,13 +3,8 @@ using Squad.Bot.Data;
 using Squad.Bot.Logging;
 using Squad.Bot.Models.AI;
 using Squad.Bot.Models.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Squad.Bot.Events
+namespace Squad.Bot.FunctionalModules.Events
 {
     public class Guild
     {
@@ -56,7 +51,7 @@ namespace Squad.Bot.Events
 
             if (guild == null)
             {
-                _logger.LogError("Couldn't find old Guild {oldGuildName}, id = {id}",ex: new NullReferenceException(), oldGuild.Name, oldGuild.Id);
+                _logger.LogError("Couldn't find old Guild {oldGuildName}, id = {id}", ex: new NullReferenceException(), oldGuild.Name, oldGuild.Id);
             }
             else
             {

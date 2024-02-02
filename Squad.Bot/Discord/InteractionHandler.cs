@@ -4,7 +4,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squad.Bot.Data;
-using Squad.Bot.Events;
+using Squad.Bot.FunctionalModules.Events;
 using Squad.Bot.Logging;
 using System.Reflection;
 using IResult = Discord.Interactions.IResult;
@@ -49,7 +49,6 @@ namespace Squad.Bot.Discord
             #region service providers
             // Initialize the handler and services for communication with the server
             UserGuildEvent userGuildEvent = new (_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
-            UserMessages userMessages = new (_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
             OnUserStateChange userStateChange = new (_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
             Guild guild = new(_services.GetRequiredService < SquadDBContext>(), _services.GetRequiredService<Logger>());
             #endregion
@@ -65,8 +64,8 @@ namespace Squad.Bot.Discord
 
             #region events
             // Subscribes for events
-            _client.MessageReceived += userMessages.OnUserMessageReceived;
             _client.UserVoiceStateUpdated += userStateChange.OnUserVoiceStateUpdate;
+            _client.MessageReceived += userGuildEvent.OnUserMessageReceived;
             _client.UserLeft += userGuildEvent.OnUserLeftGuild;
             _client.UserJoined += userGuildEvent.OnUserJoinGuild;
             _client.JoinedGuild += guild.OnGuildJoined;

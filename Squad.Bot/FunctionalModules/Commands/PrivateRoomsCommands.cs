@@ -7,7 +7,7 @@ using Squad.Bot.Logging;
 using Squad.Bot.Utilities;
 using System.Threading.Tasks;
 
-namespace Squad.Bot.Commands
+namespace Squad.Bot.FunctionalModules.Commands
 {
     [Group("private_rooms", "Help you manage private rooms")]
     public class PrivateRoomsCommands : InteractionModuleBase<SocketInteractionContext>
@@ -34,12 +34,12 @@ namespace Squad.Bot.Commands
         [DefaultMemberPermissions(GuildPermission.Administrator)]
         public async Task Invite(string voiceChannelName = "➕・Create", string settingsChannelName = "⚙️・Settings", string categoryName = "Portal")
         {
-            N:
+        N:
             var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
             if (savedPortal?.CategoryID != null && savedPortal?.ChannelID != null)
             {
-                if(Context.Guild.GetCategoryChannel(savedPortal.CategoryID) == null && Context.Guild.GetVoiceChannel(savedPortal.ChannelID) == null && Context.Guild.GetTextChannel(savedPortal.SettingsChannelID) == null)
+                if (Context.Guild.GetCategoryChannel(savedPortal.CategoryID) == null && Context.Guild.GetVoiceChannel(savedPortal.ChannelID) == null && Context.Guild.GetTextChannel(savedPortal.SettingsChannelID) == null)
                 {
                     _dbContext.PrivateRooms.Remove(savedPortal);
                     await _dbContext.SaveChangesAsync();
@@ -51,8 +51,8 @@ namespace Squad.Bot.Commands
                     var component = new ComponentBuilder()
                                             .WithButton(label: "Delete", customId: "portal.delete", style: ButtonStyle.Danger);
 
-                    await RespondAsync(text: $"{Context.Guild.CurrentUser.Nickname ?? Context.User.Username ?? Context.User.GlobalName}, private rooms already created", 
-                                                                         components: component.Build(), 
+                    await RespondAsync(text: $"{Context.Guild.CurrentUser.Nickname ?? Context.User.Username ?? Context.User.GlobalName}, private rooms already created",
+                                                                         components: component.Build(),
                                                                          ephemeral: true);
                 }
             }
@@ -76,17 +76,26 @@ namespace Squad.Bot.Commands
 
                 var category = await Context.Guild.CreateCategoryChannelAsync(categoryName, tcp => { tcp.PermissionOverwrites = categoryOverwrites.CreateOptionalOverwrites(); });
 
-                var voiceChannel = await Context.Guild.CreateVoiceChannelAsync(voiceChannelName, tcp => {tcp.CategoryId = category.Id;
-                                                                                                         tcp.PermissionOverwrites = voiceOverwrites.CreateOptionalOverwrites();});
+                var voiceChannel = await Context.Guild.CreateVoiceChannelAsync(voiceChannelName, tcp =>
+                {
+                    tcp.CategoryId = category.Id;
+                    tcp.PermissionOverwrites = voiceOverwrites.CreateOptionalOverwrites();
+                });
 
-                var settingsChannel = await Context.Guild.CreateTextChannelAsync(settingsChannelName, tcp => {tcp.CategoryId = category.Id;
-                                                                                                          tcp.Topic = "manage private rooms";
-                                                                                                          tcp.PermissionOverwrites = settingsOverwrites.CreateOptionalOverwrites();});
+                var settingsChannel = await Context.Guild.CreateTextChannelAsync(settingsChannelName, tcp =>
+                {
+                    tcp.CategoryId = category.Id;
+                    tcp.Topic = "manage private rooms";
+                    tcp.PermissionOverwrites = settingsOverwrites.CreateOptionalOverwrites();
+                });
 
-                await _dbContext.PrivateRooms.AddAsync(new Models.Base.PrivateRooms { CategoryID = category.Id, 
-                                                                                      ChannelID = voiceChannel.Id, 
-                                                                                      SettingsChannelID = settingsChannel.Id, 
-                                                                                      Guilds = await _dbContext.Guilds.FirstAsync(x => x.Id == Context.Guild.Id) });
+                await _dbContext.PrivateRooms.AddAsync(new Models.Base.PrivateRooms
+                {
+                    CategoryID = category.Id,
+                    ChannelID = voiceChannel.Id,
+                    SettingsChannelID = settingsChannel.Id,
+                    Guilds = await _dbContext.Guilds.FirstAsync(x => x.Id == Context.Guild.Id)
+                });
                 await _dbContext.SaveChangesAsync();
 
                 //Buttons

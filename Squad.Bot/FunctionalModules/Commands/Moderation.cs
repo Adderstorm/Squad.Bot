@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Squad.Bot.Logging;
 using Squad.Bot.Utilities;
 
-namespace Squad.Bot.Commands
+namespace Squad.Bot.FunctionalModules.Commands
 {
     /// <summary>
     /// A class containing commands for moderation.
