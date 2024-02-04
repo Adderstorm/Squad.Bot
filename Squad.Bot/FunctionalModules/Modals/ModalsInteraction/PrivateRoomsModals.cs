@@ -1,8 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
-using NLog;
 using Squad.Bot.Data;
-using Squad.Bot.FunctionalModules.Modals;
+using Squad.Bot.Logging;
 using Squad.Bot.Utilities;
 
 namespace Squad.Bot.FunctionalModules.Modals.ModalsInteraction
@@ -19,7 +18,7 @@ namespace Squad.Bot.FunctionalModules.Modals.ModalsInteraction
         [ModalInteraction("renameModal")]
         public async Task RenameModalInteraction(RenameModal modal)
         {
-            await Context.Guild.GetUser(Context.User.Id).VoiceChannel.ModifyAsync(x => x.Name = modal.ChannelName);
+            await Context.Guild.GetUser(Context.User.Id).VoiceChannel.ModifyAsync(x => x.Name = modal.ChannelName.Replace("{game}", Context.User.Activities.First().Name).Replace("{username}", Context.Guild.CurrentUser.Nickname ?? Context.User.Username ?? Context.User.GlobalName));
 
             var embed = new EmbedBuilder
             {
@@ -43,7 +42,7 @@ namespace Squad.Bot.FunctionalModules.Modals.ModalsInteraction
                 var embedError = new EmbedBuilder
                 {
                     Title = "Error",
-                    Description = "Not a number in limit input ro negative number",
+                    Description = "Not a number in limit input or negative number",
                     Color = CustomColors.Failure,
                 };
 

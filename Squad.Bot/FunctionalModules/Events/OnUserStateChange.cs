@@ -1,10 +1,10 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Squad.Bot.Data;
 using Squad.Bot.Logging;
-using Squad.Bot.Utilities;
-using Discord;
 using Squad.Bot.Models.Base;
+using Squad.Bot.Utilities;
 
 namespace Squad.Bot.FunctionalModules.Events
 {

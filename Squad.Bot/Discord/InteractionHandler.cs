@@ -48,9 +48,9 @@ namespace Squad.Bot.Discord
 
             #region service providers
             // Initialize the handler and services for communication with the server
-            UserGuildEvent userGuildEvent = new (_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
-            OnUserStateChange userStateChange = new (_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
-            Guild guild = new(_services.GetRequiredService < SquadDBContext>(), _services.GetRequiredService<Logger>());
+            UserGuildEvent userGuildEvent = new(_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
+            OnUserStateChange userStateChange = new(_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
+            Guild guild = new(_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
             #endregion
 
             // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService
@@ -59,6 +59,7 @@ namespace Squad.Bot.Discord
             #region Interaction payloads
             // Process the InteractionCreated payloads to execute Interactions commands
             _client.InteractionCreated += HandleInteraction;
+            _handler.InteractionExecuted += InteractionExecuted;
             _client.Ready += ReadyAsync;
             #endregion
 
@@ -71,9 +72,6 @@ namespace Squad.Bot.Discord
             _client.JoinedGuild += guild.OnGuildJoined;
             _client.LeftGuild += guild.OnGuildLeft;
             #endregion
-
-            // Process the command execution results 
-            _handler.InteractionExecuted += InteractionExecuted;
         }
 
         private async Task ReadyAsync()
@@ -87,8 +85,31 @@ namespace Squad.Bot.Discord
 #endif
         }
 
-        private Task InteractionExecuted(ICommandInfo arg1, IInteractionContext arg2, IResult arg3)
+        private async Task<Task> InteractionExecuted(ICommandInfo arg1, IInteractionContext arg2, IResult arg3)
         {
+            if (!arg3.IsSuccess)
+            {
+                switch (arg3.Error)
+                {
+                    case InteractionCommandError.UnmetPrecondition:
+                        await arg2.Interaction.RespondAsync($"Unmet Precondition: {arg3.ErrorReason}");
+                        break;
+                    case InteractionCommandError.UnknownCommand:
+                        await arg2.Interaction.RespondAsync("Unknown command");
+                        break;
+                    case InteractionCommandError.BadArgs:
+                        await arg2.Interaction.RespondAsync("Invalid number or arguments");
+                        break;
+                    case InteractionCommandError.Exception:
+                        await arg2.Interaction.RespondAsync($"Command exception: {arg3.ErrorReason}");
+                        break;
+                    case InteractionCommandError.Unsuccessful:
+                        await arg2.Interaction.RespondAsync("Command could not be executed");
+                        break;
+                    default:
+                        break;
+                }
+            }
             return Task.CompletedTask;
         }
 

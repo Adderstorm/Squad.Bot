@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Squad.Bot.Logging;
-using Squad.Bot.Models.AI;
 using Squad.Bot.Models.Base;
 
 namespace Squad.Bot.Data

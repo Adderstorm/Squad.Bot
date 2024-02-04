@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Microsoft.Extensions.Logging;
 using Squad.Bot.Logging;
 using Squad.Bot.Utilities;
 

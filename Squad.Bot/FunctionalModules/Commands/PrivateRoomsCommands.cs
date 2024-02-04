@@ -1,11 +1,8 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Squad.Bot.Data;
-using Squad.Bot.Logging;
 using Squad.Bot.Utilities;
-using System.Threading.Tasks;
 
 namespace Squad.Bot.FunctionalModules.Commands
 {

@@ -44,7 +44,8 @@ namespace Squad.Bot.Logging
 
         public Task LogDiscord(LogMessage message)
         {
-            switch(message.Severity) {
+            switch (message.Severity)
+            {
                 case LogSeverity.Critical:
                     LogCritical(message.Message, message.Exception, message.Source);
                     break;

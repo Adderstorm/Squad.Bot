@@ -39,7 +39,7 @@ namespace Squad.Bot.Utilities
         /// <returns>A collection of permission overwrites for the specified target.</returns>
         public Optional<IEnumerable<Overwrite>> CreateOptionalOverwrites()
         {
-            return Optional.Create(new List<Overwrite> { new (targetId: TargetId, targetType: TargetType, permissions: Permissions) }.ToAsyncEnumerable().ToEnumerable());
+            return Optional.Create(new List<Overwrite> { new(targetId: TargetId, targetType: TargetType, permissions: Permissions) }.ToAsyncEnumerable().ToEnumerable());
         }
     }
 }

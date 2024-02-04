@@ -52,7 +52,7 @@ namespace Squad.Bot.FunctionalModules.Components
                 Title = "Portals was successfully deleted",
                 Description = "Now you can use again /private_rooms invite",
                 Color = CustomColors.Success,
-            }.WithAuthor(name: Context.Guild.CurrentUser.Nickname ?? Context.User.Username ?? Context.User.GlobalName, iconUrl: Context.Guild.CurrentUser.GetGuildAvatarUrl());
+            }.WithAuthor(Context.Guild.CurrentUser);
 
             await RespondAsync(embed: embed.Build(), ephemeral: true);
         }
@@ -165,31 +165,22 @@ namespace Squad.Bot.FunctionalModules.Components
                 ChannelPermissions = ChannelPermissions.Modify(connect: PermValue.Deny);
 
                 await user.VoiceChannel.AddPermissionOverwriteAsync(everyoneRole, ChannelPermissions);
-
-                EmbedBuilder embed = new()
-                {
-                    Title = "Lock/unlock room for everyone",
-                    Description = "",
-                    Color = CustomColors.Success
-                };
-
-                await RespondAsync(embed: embed.Build(), ephemeral: true);
             }
             else
             {
                 ChannelPermissions = ChannelPermissions.Modify(connect: PermValue.Allow);
 
                 await user.VoiceChannel.AddPermissionOverwriteAsync(everyoneRole, ChannelPermissions);
-
-                EmbedBuilder embed = new()
-                {
-                    Title = "Lock/unlock room for everyone",
-                    Description = "",
-                    Color = CustomColors.Success
-                };
-
-                await RespondAsync(embed: embed.Build(), ephemeral: true);
             }
+
+            EmbedBuilder embed = new()
+            {
+                Title = "Lock/unlock room for everyone",
+                Description = "",
+                Color = CustomColors.Success
+            };
+
+            await RespondAsync(embed: embed.Build(), ephemeral: true);
         }
 
         [ComponentInteraction("portal.limit")]
@@ -234,7 +225,7 @@ namespace Squad.Bot.FunctionalModules.Components
                     Description = "Oooppss, something went wrong...",
                     Color = CustomColors.Failure,
                 }
-                .WithAuthor(Context.User)
+                .WithAuthor(Context.Guild.CurrentUser)
                 .AddField(name: "This could be due to the fact that discord broke something... or update)", value: ex.Message + ex.GetType());
 
                 await RespondAsync(embed: embed.Build(), ephemeral: true);
@@ -304,7 +295,6 @@ namespace Squad.Bot.FunctionalModules.Components
                     Description = "Oooppss, something went wrong...",
                     Color = CustomColors.Failure,
                 }
-                .WithAuthor(Context.User)
                 .AddField(name: "This could be due to the fact that discord broke something... or update)", value: ex.Message + ex.GetType());
 
                 await RespondAsync(embed: embed.Build(), ephemeral: true);
