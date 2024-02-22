@@ -9,13 +9,13 @@ using Squad.Bot.Utilities;
 
 namespace Squad.Bot.FunctionalModules.Components
 {
-    public class PrivateRoomsComponents : InteractionModuleBase<SocketInteractionContext>
+    public partial class PrivateRooms : InteractionModuleBase<SocketInteractionContext>
     {
 
         private readonly SquadDBContext _dbContext;
         private readonly Logger _logger;
 
-        public PrivateRoomsComponents(SquadDBContext dbContext, Logger logger)
+        public PrivateRooms(SquadDBContext dbContext, Logger logger)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -56,8 +56,6 @@ namespace Squad.Bot.FunctionalModules.Components
 
             await RespondAsync(embed: embed.Build(), ephemeral: true);
         }
-
-        // TODO: Untested code
 
         [ComponentInteraction("portal.hide")]
         [IsUserInPRoom]
@@ -110,7 +108,7 @@ namespace Squad.Bot.FunctionalModules.Components
         {
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            // TODO: waiting when Discord API devs updates select menus(not sure)
+            // waiting when Discord API devs updates select menus(not sure)
             //var connectedUsers = Context.Guild.GetVoiceChannel(user.VoiceChannel.Id).ConnectedUsers;
 
             var selectMenus = new SelectMenuBuilder(customId: "portal.Kick.Select",
@@ -133,7 +131,7 @@ namespace Squad.Bot.FunctionalModules.Components
         {
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            // TODO: waiting when Discord API devs updates select menus(not sure)
+            // waiting when Discord API devs updates select menus(not sure)
             //var connectedUsers = Context.Guild.GetVoiceChannel(user.VoiceChannel.Id).ConnectedUsers;
 
             var selectMenus = new SelectMenuBuilder(customId: "portal.Owner.Select",
@@ -188,8 +186,6 @@ namespace Squad.Bot.FunctionalModules.Components
         [IsUserOwner]
         public async Task Limit()
         {
-            var user = Context.Guild.GetUser(Context.User.Id);
-
             await RespondWithModalAsync<LimitModal>("changeLimit");
         }
 
@@ -198,8 +194,6 @@ namespace Squad.Bot.FunctionalModules.Components
         [IsUserOwner]
         public async Task Rename()
         {
-            var user = Context.Guild.GetUser(Context.User.Id);
-
             await RespondWithModalAsync<RenameModal>("renameModal");
         }
 

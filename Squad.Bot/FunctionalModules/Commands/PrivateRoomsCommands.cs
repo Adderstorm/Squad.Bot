@@ -7,15 +7,15 @@ using Squad.Bot.Utilities;
 namespace Squad.Bot.FunctionalModules.Commands
 {
     [Group("private_rooms", "Help you manage private rooms")]
-    public class PrivateRoomsCommands : InteractionModuleBase<SocketInteractionContext>
+    public partial class PrivateRooms : InteractionModuleBase<SocketInteractionContext>
     {
         private readonly SquadDBContext _dbContext;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PrivateRoomsCommands"/> class.
+        /// Initializes a new instance of the <see cref="PrivateRooms"/> class.
         /// </summary>
         /// <param name="context">The interaction context.</param>
-        public PrivateRoomsCommands(SquadDBContext context)
+        public PrivateRooms(SquadDBContext context)
         {
             _dbContext = context;
         }
