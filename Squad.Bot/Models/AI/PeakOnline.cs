@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Squad.Bot.Models.AI
 {
-    [Table("peakOnline")]
     public class PeakOnline
     {
         [Key]

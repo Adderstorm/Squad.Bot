@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Squad.Bot.Models.Base
 {
-    [Table("blacklist")]
     public class BlackList
     {
         [Key]

@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Squad.Bot.Models.AI
 {
-    [Table("newMembersActivity")]
     public class NewMembersActivity
     {
         [Key]

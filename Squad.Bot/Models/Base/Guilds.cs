@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Squad.Bot.Models.Base
 {
-    [Table("servers")]
     public class Guilds
     {
         [Key]
@@ -17,7 +16,7 @@ namespace Squad.Bot.Models.Base
 
         public ICollection<TotalMembers>? TotalMembers { get; set; }
 
-        public DateTime? DeletedAt { get; set; }
+        public DateTime? DeletedAt { get; set; } = null;
 
         public DateTime AddedAt { get; set; } = DateTime.UtcNow;
     }
