@@ -16,15 +16,12 @@ namespace Squad.Bot.Data
         public DbSet<Users> Users { get; set; }
         public DbSet<Warns> Warns { get; set; }
         public DbSet<JoinDate> JoinDate { get; set; }
+        public DbSet<LeftDate> LeftDate { get; set; }
         public DbSet<MemberMessagesActivity> MemberMessagesActivity { get; set; }
         public DbSet<MembersActivity> MembersActivity { get; set; }
         public DbSet<MemberVoiceActivity> MemberVoiceActivity { get; set; }
         public DbSet<MessagesActivity> MessagesActivity { get; set; }
-        public DbSet<NewMembers> NewMembers { get; set; }
-        public DbSet<NewMembersActivity> NewMembersActivity { get; set; }
-        public DbSet<NewMembersLeftWeek> NewMembersLeftWeek { get; set; }
         public DbSet<PeakOnline> PeakOnline { get; set; }
-        public DbSet<TotalLeaves> TotalLeaves { get; set; }
         public DbSet<TotalMembers> TotalMembers { get; set; }
     }
 

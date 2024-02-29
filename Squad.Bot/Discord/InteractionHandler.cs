@@ -50,7 +50,7 @@ namespace Squad.Bot.Discord
             // Initialize the handler and services for communication with the server
             UserGuildEvent userGuildEvent = new(_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
             OnUserStateChange userStateChange = new(_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
-            Guild guild = new(_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
+            GuildEvent guild = new(_services.GetRequiredService<SquadDBContext>(), _services.GetRequiredService<Logger>());
             #endregion
 
             // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService

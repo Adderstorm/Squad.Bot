@@ -6,12 +6,12 @@ using Squad.Bot.Models.Base;
 
 namespace Squad.Bot.FunctionalModules.Events
 {
-    public class Guild
+    public class GuildEvent
     {
         private readonly SquadDBContext _dbContext;
         private readonly Logger _logger;
 
-        public Guild(SquadDBContext dbContext, Logger logger)
+        public GuildEvent(SquadDBContext dbContext, Logger logger)
         {
             _dbContext = dbContext;
             _logger = logger;
