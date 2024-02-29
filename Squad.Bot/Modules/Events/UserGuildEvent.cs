@@ -54,7 +54,7 @@ namespace Squad.Bot.FunctionalModules.Events
             Users? user = await _dbContext.Users.FindAsync((Users x) => x.Id == socketUser.Id);
             Guilds? guild = await _dbContext.Guilds.FindAsync((Guilds x) => x.Id == socketGuild.Id);
 
-#pragma warning disable CS8601 // Perhaps the destination is a reference that allows a NULL value. / does not allow
+#pragma warning disable CS8601 // Perhaps the destination is a reference that allows a NULL value. / P.S. does not allow
             LeftDate leftDate = new()
             {
                 User = user,
@@ -65,7 +65,7 @@ namespace Squad.Bot.FunctionalModules.Events
                 Guilds = guild,
                 TotalUsers = socketGuild.MemberCount,
             };
-#pragma warning restore CS8601 // Perhaps the destination is a reference that allows a NULL value. / does not allow
+#pragma warning restore CS8601 // Perhaps the destination is a reference that allows a NULL value. / P.S. does not allow
         }
 
         public async Task OnUserMessageReceived(SocketMessage message)
