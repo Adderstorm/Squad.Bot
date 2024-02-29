@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using Squad.Bot.Data;
 using Squad.Bot.Logging;
 using Squad.Bot.Models.AI;
@@ -23,27 +24,81 @@ namespace Squad.Bot.FunctionalModules.Events
         {
             Users? user = await _dbContext.Users.FindAsync((Users x) => x.Id == guildUser.Id);
             Guilds? guild = await _dbContext.Guilds.FindAsync((Guilds x) => x.Id == guildUser.Guild.Id);
+
+            if (guild == null)
+            {
+                GuildEvent newGuild = new(_dbContext, _logger);
+
+                await newGuild.OnGuildJoined(guildUser.Guild);
+
+                guild = await _dbContext.Guilds.FindAsync((Guilds x) => x.Id == guildUser.Guild.Id);
+            }
             if (user == null)
             {
                 user = new()
                 {
                     Id = guildUser.Id,
-                    Nick = guildUser.Nickname,
+                    Nick = guildUser.GlobalName,
                 };
-            }
-            else
-            {
-                NewMembers newMember = new()
-                {
-                    Guilds = guild,
 
-                };
+                await _dbContext.AddAsync(user);
             }
+
+#pragma warning disable CS8601 // Возможно, назначение-ссылка, допускающее значение NULL. / не допускает
+            JoinDate joinDate = new()
+            {
+                Guilds = guild,
+                User = user,
+            };
+            TotalMembers totalMembers = new()
+            {
+                Guilds = guild,
+                TotalUsers = guildUser.Guild.MemberCount,
+            };
+#pragma warning restore CS8601 // Возможно, назначение-ссылка, допускающее значение NULL. / не допускает
+
+            await _dbContext.AddAsync(joinDate);
+            await _dbContext.AddAsync(totalMembers);
+
+            await _dbContext.SaveChangesAsync();
         }
 
-        public async Task OnUserLeftGuild(SocketGuild guild, SocketUser user)
+        public async Task OnUserLeftGuild(SocketGuild socketGuild, SocketUser socketUser)
         {
+            Users? user = await _dbContext.Users.FindAsync((Users x) => x.Id == socketUser.Id);
+            Guilds? guild = await _dbContext.Guilds.FindAsync((Guilds x) => x.Id == socketGuild.Id);
 
+            if (guild == null)
+            {
+                GuildEvent newGuild = new(_dbContext, _logger);
+
+                await newGuild.OnGuildJoined(socketGuild);
+
+                guild = await _dbContext.Guilds.FindAsync((Guilds x) => x.Id == socketGuild.Id);
+            }
+            if (user == null)
+            {
+                user = new()
+                {
+                    Id = socketUser.Id,
+                    Nick = socketUser.GlobalName,
+                };
+
+                await _dbContext.AddAsync(user);
+            }
+
+#pragma warning disable CS8601 // Возможно, назначение-ссылка, допускающее значение NULL. / не допускает
+            LeftDate leftDate = new()
+            {
+                User = user,
+                Guilds = guild,
+            };
+            TotalMembers totalMembers = new()
+            {
+                Guilds = guild,
+                TotalUsers = socketGuild.MemberCount,
+            };
+#pragma warning restore CS8601 // Возможно, назначение-ссылка, допускающее значение NULL. / не допускает
         }
 
         public async Task OnUserMessageReceived(SocketMessage message)
