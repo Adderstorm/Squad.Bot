@@ -9,7 +9,7 @@ namespace Squad.Bot.Data
         public static void CreateDbIfNotExists(this IHost host)
         {
             {
-#pragma warning disable IDE0063 // Использовать простой оператор using
+#pragma warning disable IDE0063 // Use a simple using statement
                 using (var scope = host.Services.CreateScope())
                 {
                     var services = scope.ServiceProvider;
@@ -23,7 +23,7 @@ namespace Squad.Bot.Data
                     context.PrivateRooms.Add(privateRoom);
                     context.SaveChanges();
                 }
-#pragma warning restore IDE0063 // Использовать простой оператор using
+#pragma warning restore IDE0063 // Use a simple using statement
             }
         }
     }

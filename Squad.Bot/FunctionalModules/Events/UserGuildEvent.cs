@@ -44,7 +44,7 @@ namespace Squad.Bot.FunctionalModules.Events
                 await _dbContext.AddAsync(user);
             }
 
-#pragma warning disable CS8601 // Возможно, назначение-ссылка, допускающее значение NULL. / не допускает
+#pragma warning disable CS8601 // Perhaps the destination is a reference that allows a NULL value. / does not allow
             JoinDate joinDate = new()
             {
                 Guilds = guild,
@@ -55,7 +55,7 @@ namespace Squad.Bot.FunctionalModules.Events
                 Guilds = guild,
                 TotalUsers = guildUser.Guild.MemberCount,
             };
-#pragma warning restore CS8601 // Возможно, назначение-ссылка, допускающее значение NULL. / не допускает
+#pragma warning restore CS8601 // Perhaps the destination is a reference that allows a NULL value. / does not allow
 
             await _dbContext.AddAsync(joinDate);
             await _dbContext.AddAsync(totalMembers);
@@ -87,7 +87,7 @@ namespace Squad.Bot.FunctionalModules.Events
                 await _dbContext.AddAsync(user);
             }
 
-#pragma warning disable CS8601 // Возможно, назначение-ссылка, допускающее значение NULL. / не допускает
+#pragma warning disable CS8601 // Perhaps the destination is a reference that allows a NULL value. / does not allow
             LeftDate leftDate = new()
             {
                 User = user,
@@ -98,7 +98,7 @@ namespace Squad.Bot.FunctionalModules.Events
                 Guilds = guild,
                 TotalUsers = socketGuild.MemberCount,
             };
-#pragma warning restore CS8601 // Возможно, назначение-ссылка, допускающее значение NULL. / не допускает
+#pragma warning restore CS8601 // Perhaps the destination is a reference that allows a NULL value. / does not allow
         }
 
         public async Task OnUserMessageReceived(SocketMessage message)

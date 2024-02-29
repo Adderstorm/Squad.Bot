@@ -26,11 +26,10 @@ namespace Squad.Bot.FunctionalModules.Components
         {
             var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
-            if (savedPortal != new Models.Base.PrivateRooms())
+            if (savedPortal != default)
             {
-#pragma warning disable CS8604 // Возможно, аргумент-ссылка, допускающий значение NULL.
                 _dbContext.PrivateRooms.Remove(savedPortal);
-#pragma warning restore CS8604 // Возможно, аргумент-ссылка, допускающий значение NULL.
+
                 await _dbContext.SaveChangesAsync();
             }
 
