@@ -19,7 +19,7 @@ RUN dotnet publish "./Squad.Bot.csproj" -c $BUILD_CONFIGURATION -o /app/publish 
 
 FROM base AS final
 WORKDIR /app
-copy ["Squad.Bot/appsettings.json", "/app/"]
-copy ["Squad.Bot/SquadDb.db", "/app/"]
+COPY ["Squad.Bot/appsettings.json", "/app/"]
+COPY ["Squad.Bot/SquadDb.db", "/app/"]
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Squad.Bot.dll"]
