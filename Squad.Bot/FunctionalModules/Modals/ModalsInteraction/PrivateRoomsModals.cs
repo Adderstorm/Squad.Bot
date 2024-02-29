@@ -10,7 +10,7 @@ namespace Squad.Bot.FunctionalModules.Modals.ModalsInteraction
     {
         private readonly Logger _logger;
 
-        public PrivateRoomsModals(SquadDBContext dbContext, Logger logger)
+        public PrivateRoomsModals(Logger logger)
         {
             _logger = logger;
         }
