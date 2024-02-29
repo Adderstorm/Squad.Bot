@@ -34,7 +34,7 @@ namespace Squad.Bot.FunctionalModules.Events
 
         private async Task PrivateRooms(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)
         {
-            PrivateRooms? savedPortal = new();
+            PrivateRooms? savedPortal;
             if (oldState.VoiceChannel == null)
                 savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == newState.VoiceChannel.Guild.Id);
             else if (newState.VoiceChannel == null)
