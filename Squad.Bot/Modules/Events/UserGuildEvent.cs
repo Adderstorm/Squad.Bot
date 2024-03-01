@@ -20,7 +20,6 @@ namespace Squad.Bot.FunctionalModules.Events
             _logger = logger;
         }
 
-        // TODO: Change the stubs with the working code
         public async Task OnUserJoinGuild(SocketGuildUser guildUser)
         {
             await CheckPossibleNullData(guildUser.Guild, guildUser);
@@ -70,9 +69,54 @@ namespace Squad.Bot.FunctionalModules.Events
 
         public async Task OnUserMessageReceived(SocketMessage message)
         {
+            if (message.Channel is SocketGuild socketGuild)
+            {
+                await CheckPossibleNullData(socketGuild, message.Author);
+
+                Users? user = await _dbContext.Users.FindAsync((Users x) => x.Id == message.Author.Id);
+                Guilds? guild = await _dbContext.Guilds.FindAsync((Guilds x) => x.Id == socketGuild.Id);
+
+                if(message.Source == MessageSource.User)
+                {
+
+#pragma warning disable CS8601 // Perhaps the destination is a reference that allows a NULL value. / P.S. does not allow
+                    MemberMessagesActivity memberMessagesActivity = new()
+                    {
+                        User = user,
+                        Guilds = guild,
+                    };
+                    MembersActivity membersActivity = new()
+                    {
+                        Guilds = guild,
+                        User = user,
+                    };
+#pragma warning restore CS8601 // Perhaps the destination is a reference that allows a NULL value. / P.S. does not allow
+
+                    await _dbContext.AddAsync(memberMessagesActivity);
+                    await _dbContext.AddAsync(membersActivity);
+
+                }
+
+#pragma warning disable CS8601 // Perhaps the destination is a reference that allows a NULL value. / P.S. does not allow
+                MessagesActivity messagesActivity = new()
+                {
+                    Guilds = guild,
+                };
+#pragma warning restore CS8601 // Perhaps the destination is a reference that allows a NULL value. / P.S. does not allow
+
+                await _dbContext.AddAsync(messagesActivity);
+
+                await _dbContext.SaveChangesAsync();
+            }
             _logger.LogDebug("{nameOfFunc} has been executed by {Author.Username}:{Author.Id} in {Channel.Id} channel", nameof(OnUserMessageReceived), message.Author.Username, message.Author.Id, message.Channel.Id);
         }
 
+        /// <summary>
+        /// Checks if the given SocketGuild and SocketUser have data in the database, if not, creates new data.
+        /// </summary>
+        /// <param name="socketGuild">The SocketGuild to check for.</param>
+        /// <param name="socketUser">The SocketUser to check for.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         private async Task CheckPossibleNullData(SocketGuild socketGuild, SocketUser socketUser)
         {
             Users? user = await _dbContext.Users.FindAsync((Users x) => x.Id == socketUser.Id);
@@ -88,6 +132,11 @@ namespace Squad.Bot.FunctionalModules.Events
             }
         }
 
+        /// <summary>
+        /// Creates new data for a new guild.
+        /// </summary>
+        /// <param name="socketGuild">The new guild.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         private async Task CreateNewGuild(SocketGuild socketGuild)
         {
             GuildEvent newGuild = new(_dbContext, _logger);
@@ -95,6 +144,11 @@ namespace Squad.Bot.FunctionalModules.Events
             await newGuild.OnGuildJoined(socketGuild);
         }
 
+        /// <summary>
+        /// Creates new data for a new user.
+        /// </summary>
+        /// <param name="socketUser">The new user.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         private async Task CreateNewUser(SocketUser socketUser)
         {
             Users user = new()
