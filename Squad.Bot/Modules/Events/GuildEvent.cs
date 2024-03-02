@@ -1,4 +1,5 @@
 ﻿using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Squad.Bot.Data;
 using Squad.Bot.Logging;
 using Squad.Bot.Models.AI;
@@ -19,8 +20,8 @@ namespace Squad.Bot.FunctionalModules.Events
 
         public async Task OnGuildJoined(SocketGuild newGuild)
         {
-            Guilds? guild = await _dbContext.Guilds.FindAsync((Guilds g) => g.Id == newGuild.Id);
-            if (guild == null)
+            Guilds? guild = await _dbContext.Guilds.FirstOrDefaultAsync(g => g.Id == newGuild.Id);
+            if (guild == default)
             {
                 guild = new Guilds
                 {
@@ -47,9 +48,9 @@ namespace Squad.Bot.FunctionalModules.Events
 
         public async Task OnGuildLeft(SocketGuild oldGuild)
         {
-            Guilds? guild = await _dbContext.Guilds.FindAsync((Guilds g) => g.Id == oldGuild.Id);
+            Guilds? guild = await _dbContext.Guilds.FirstOrDefaultAsync(g => g.Id == oldGuild.Id);
 
-            if (guild == null)
+            if (guild == default)
             {
                 _logger.LogError("Couldn't find old Guild {oldGuildName}, id = {id}", ex: new NullReferenceException(), oldGuild.Name, oldGuild.Id);
             }

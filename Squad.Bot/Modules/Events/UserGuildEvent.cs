@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Squad.Bot.Data;
 using Squad.Bot.Logging;
 using Squad.Bot.Models.AI;
@@ -24,8 +25,8 @@ namespace Squad.Bot.FunctionalModules.Events
         {
             await CheckPossibleNullData(guildUser.Guild, guildUser);
 
-            Users? user = await _dbContext.Users.FindAsync((Users x) => x.Id == guildUser.Id);
-            Guilds? guild = await _dbContext.Guilds.FindAsync((Guilds x) => x.Id == guildUser.Guild.Id);
+            Users? user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == guildUser.Id);
+            Guilds? guild = await _dbContext.Guilds.FirstOrDefaultAsync(x => x.Id == guildUser.Guild.Id);
 
 #pragma warning disable CS8601 // Perhaps the destination is a reference that allows a NULL value. / does not allow
             JoinDate joinDate = new()
@@ -50,8 +51,8 @@ namespace Squad.Bot.FunctionalModules.Events
         {
             await CheckPossibleNullData(socketGuild, socketUser);
 
-            Users? user = await _dbContext.Users.FindAsync((Users x) => x.Id == socketUser.Id);
-            Guilds? guild = await _dbContext.Guilds.FindAsync((Guilds x) => x.Id == socketGuild.Id);
+            Users? user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == socketUser.Id);
+            Guilds? guild = await _dbContext.Guilds.FirstOrDefaultAsync(x => x.Id == socketGuild.Id);
 
 #pragma warning disable CS8601 // Perhaps the destination is a reference that allows a NULL value. / P.S. does not allow
             LeftDate leftDate = new()
@@ -73,28 +74,33 @@ namespace Squad.Bot.FunctionalModules.Events
             {
                 await CheckPossibleNullData(socketGuild, message.Author);
 
-                Users? user = await _dbContext.Users.FindAsync((Users x) => x.Id == message.Author.Id);
-                Guilds? guild = await _dbContext.Guilds.FindAsync((Guilds x) => x.Id == socketGuild.Id);
+                Users? user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == message.Author.Id);
+                Guilds? guild = await _dbContext.Guilds.FirstOrDefaultAsync(x => x.Id == socketGuild.Id);
+                MembersActivity? membersActivity = await _dbContext.MembersActivity.FirstOrDefaultAsync(x => x.User == user);
 
-                if(message.Source == MessageSource.User)
+                if (message.Source == MessageSource.User)
                 {
-
 #pragma warning disable CS8601 // Perhaps the destination is a reference that allows a NULL value. / P.S. does not allow
                     MemberMessagesActivity memberMessagesActivity = new()
                     {
                         User = user,
                         Guilds = guild,
                     };
-                    MembersActivity membersActivity = new()
+                    MembersActivity membersActivityNew = new()
                     {
                         Guilds = guild,
                         User = user,
                     };
+
+                    membersActivity.LastActivityDate = DateTime.UtcNow;
 #pragma warning restore CS8601 // Perhaps the destination is a reference that allows a NULL value. / P.S. does not allow
 
                     await _dbContext.AddAsync(memberMessagesActivity);
-                    await _dbContext.AddAsync(membersActivity);
 
+                    if(membersActivity == default)
+                        await _dbContext.AddAsync(membersActivityNew);
+                    else
+                        _dbContext.Update(membersActivity);
                 }
 
 #pragma warning disable CS8601 // Perhaps the destination is a reference that allows a NULL value. / P.S. does not allow
@@ -108,7 +114,6 @@ namespace Squad.Bot.FunctionalModules.Events
 
                 await _dbContext.SaveChangesAsync();
             }
-            _logger.LogDebug("{nameOfFunc} has been executed by {Author.Username}:{Author.Id} in {Channel.Id} channel", nameof(OnUserMessageReceived), message.Author.Username, message.Author.Id, message.Channel.Id);
         }
 
         /// <summary>
@@ -119,14 +124,14 @@ namespace Squad.Bot.FunctionalModules.Events
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         private async Task CheckPossibleNullData(SocketGuild socketGuild, SocketUser socketUser)
         {
-            Users? user = await _dbContext.Users.FindAsync((Users x) => x.Id == socketUser.Id);
-            Guilds? guild = await _dbContext.Guilds.FindAsync((Guilds x) => x.Id == socketGuild.Id);
+            Users? user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == socketUser.Id);
+            Guilds? guild = await _dbContext.Guilds.FirstOrDefaultAsync(x => x.Id == socketGuild.Id);
 
-            if (guild == null)
+            if (guild == default)
             {
                 await CreateNewGuild(socketGuild);
             }
-            if (user == null)
+            if (user == default)
             {
                 await CreateNewUser(socketUser);
             }
