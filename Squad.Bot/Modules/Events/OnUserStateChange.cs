@@ -3,16 +3,19 @@ using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Squad.Bot.Data;
 using Squad.Bot.Logging;
+using Squad.Bot.Models.AI;
 using Squad.Bot.Models.Base;
 using Squad.Bot.Utilities;
+using System.Collections;
 
 namespace Squad.Bot.FunctionalModules.Events
 {
     public class OnUserStateChange
     {
-
         private readonly SquadDBContext _dbContext;
         private readonly Logger _logger;
+
+        private readonly Hashtable talkTime = [];
 
         public OnUserStateChange(SquadDBContext dbContext, Logger logger)
         {
@@ -23,13 +26,62 @@ namespace Squad.Bot.FunctionalModules.Events
         public async Task OnUserVoiceStateUpdate(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)
         {
             await PrivateRooms(user, oldState, newState);
-            await CollectData(user, oldState, newState);
+            await CollectTalkTimeData(user, oldState, newState);
         }
 
-        // TODO: Change the stub with the working code and !!!(if need) delete static field in CollectData
-        private async Task CollectData(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)
+        private async Task CollectTalkTimeData(SocketUser socketUser, SocketVoiceState oldState, SocketVoiceState newState)
         {
-            _logger.LogInfo("{user}, {newState}, {oldState}", user, newState, oldState);
+            // Working with old state
+            if (newState.VoiceChannel == null && talkTime.ContainsKey(socketUser.Id) && !socketUser.IsBot)
+            {
+#pragma warning disable CS8605 // Unpacking is the conversion of a probable NULL value.
+                DateTime firstConnectTime = (DateTime)talkTime[socketUser.Id];
+#pragma warning restore CS8605 // Unpacking is the conversion of a probable NULL value.
+                talkTime.Remove(socketUser.Id);
+
+                TimeSpan minutesLeft = DateTime.Now.Subtract(firstConnectTime);
+
+                await CheckPossibleNullData(oldState.VoiceChannel.Guild, socketUser);
+
+                Guilds? guild = await _dbContext.Guilds.FirstOrDefaultAsync(x => x.Id == oldState.VoiceChannel.Guild.Id);
+                Users? user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == socketUser.Id);
+                MembersActivity? membersActivity = await _dbContext.MembersActivity.FirstOrDefaultAsync(x => x.User == user);
+
+#pragma warning disable CS8601 // Perhaps the destination is a reference that allows a NULL value. / does not allow
+                MemberVoiceActivity voiceActivity = new()
+                {
+                    User = user,
+                    Guilds = guild,
+                    TotalMinutes = minutesLeft.TotalMinutes,
+                };
+                MembersActivity membersActivityNew = new()
+                {
+                    Guilds = guild,
+                    User = user,
+                };
+
+                membersActivity.LastActivityDate = DateTime.UtcNow;
+#pragma warning restore CS8601 // Perhaps the destination is a reference that allows a NULL value. / does not allow
+
+                await _dbContext.AddAsync(voiceActivity);
+
+                if (membersActivity == default)
+                    await _dbContext.AddAsync(membersActivityNew);
+                else
+                    _dbContext.Update(membersActivity);
+
+                await _dbContext.SaveChangesAsync();
+            }
+            // Working with new state
+            else if (oldState.VoiceChannel == null && !talkTime.ContainsKey(socketUser.Id) && !socketUser.IsBot)
+            {
+                talkTime.Add(socketUser.Id, DateTime.Now);
+            }
+            // Shit happening here or not :)
+            else
+            {
+
+            }
         }
 
         private async Task PrivateRooms(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)
@@ -87,6 +139,56 @@ namespace Squad.Bot.FunctionalModules.Events
                 return true;
             else
                 return false;
+        }
+
+        /// <summary>
+        /// Checks if the given SocketGuild and SocketUser have data in the database, if not, creates new data.
+        /// </summary>
+        /// <param name="socketGuild">The SocketGuild to check for.</param>
+        /// <param name="socketUser">The SocketUser to check for.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        private async Task CheckPossibleNullData(SocketGuild socketGuild, SocketUser socketUser)
+        {
+            Users? user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == socketUser.Id);
+            Guilds? guild = await _dbContext.Guilds.FirstOrDefaultAsync(x => x.Id == socketGuild.Id);
+
+            if (guild == default)
+            {
+                await CreateNewGuild(socketGuild);
+            }
+            if (user == default)
+            {
+                await CreateNewUser(socketUser);
+            }
+        }
+
+        /// <summary>
+        /// Creates new data for a new guild.
+        /// </summary>
+        /// <param name="socketGuild">The new guild.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        private async Task CreateNewGuild(SocketGuild socketGuild)
+        {
+            GuildEvent newGuild = new(_dbContext, _logger);
+
+            await newGuild.OnGuildJoined(socketGuild);
+        }
+
+        /// <summary>
+        /// Creates new data for a new user.
+        /// </summary>
+        /// <param name="socketUser">The new user.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        private async Task CreateNewUser(SocketUser socketUser)
+        {
+            Users user = new()
+            {
+                Id = socketUser.Id,
+                Nick = socketUser.GlobalName,
+            };
+
+            await _dbContext.AddAsync(user);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
