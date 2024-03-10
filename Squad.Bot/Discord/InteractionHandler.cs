@@ -65,7 +65,8 @@ namespace Squad.Bot.Discord
 
             #region events
             // Subscribes for events
-            _client.UserVoiceStateUpdated += userStateChange.OnUserVoiceStateUpdate;
+            _client.UserVoiceStateUpdated += userStateChange.PrivateRooms;
+            _client.UserVoiceStateUpdated += userStateChange.CollectTalkTimeData;
             _client.MessageReceived += userGuildEvent.OnUserMessageReceived;
             _client.UserLeft += userGuildEvent.OnUserLeftGuild;
             _client.UserJoined += userGuildEvent.OnUserJoinGuild;
@@ -92,19 +93,19 @@ namespace Squad.Bot.Discord
                 switch (arg3.Error)
                 {
                     case InteractionCommandError.UnmetPrecondition:
-                        await arg2.Interaction.RespondAsync($"Unmet Precondition: {arg3.ErrorReason}");
+                        await arg2.Interaction.RespondAsync($"Unmet Precondition: {arg3.ErrorReason}", ephemeral: true);
                         break;
                     case InteractionCommandError.UnknownCommand:
-                        await arg2.Interaction.RespondAsync("Unknown command");
+                        await arg2.Interaction.RespondAsync("Unknown command", ephemeral: true);
                         break;
                     case InteractionCommandError.BadArgs:
-                        await arg2.Interaction.RespondAsync("Invalid number or arguments");
+                        await arg2.Interaction.RespondAsync("Invalid number or arguments", ephemeral: true);
                         break;
                     case InteractionCommandError.Exception:
-                        await arg2.Interaction.RespondAsync($"Command exception: {arg3.ErrorReason}");
+                        await arg2.Interaction.RespondAsync($"Command exception: {arg3.ErrorReason}", ephemeral: true);
                         break;
                     case InteractionCommandError.Unsuccessful:
-                        await arg2.Interaction.RespondAsync("Command could not be executed");
+                        await arg2.Interaction.RespondAsync("Command could not be executed", ephemeral: true);
                         break;
                     default:
                         break;

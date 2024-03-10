@@ -16,5 +16,6 @@ namespace Squad.Bot.Models.Base
 
         public ulong ChannelID { get; set; }
         public ulong SettingsChannelID { get; set; }
+        public string DefaultRoomChannelName { get; set; } = "{username}'s channel";
     }
 }

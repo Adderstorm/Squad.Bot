@@ -23,13 +23,7 @@ namespace Squad.Bot.FunctionalModules.Events
             _logger = logger;
         }
 
-        public async Task OnUserVoiceStateUpdate(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)
-        {
-            await PrivateRooms(user, oldState, newState);
-            await CollectTalkTimeData(user, oldState, newState);
-        }
-
-        private async Task CollectTalkTimeData(SocketUser socketUser, SocketVoiceState oldState, SocketVoiceState newState)
+        public async Task CollectTalkTimeData(SocketUser socketUser, SocketVoiceState oldState, SocketVoiceState newState)
         {
             // Working with old state
             if (newState.VoiceChannel == null && talkTime.ContainsKey(socketUser.Id) && !socketUser.IsBot)
@@ -60,12 +54,22 @@ namespace Squad.Bot.FunctionalModules.Events
                     User = user,
                 };
 
-                membersActivity.LastActivityDate = DateTime.UtcNow;
+                if(membersActivity == null)
+                {
+                    membersActivity = new()
+                    {
+                        User = user,
+                        Guilds = guild,
+                        LastActivityDate = DateTime.UtcNow,
+                    };
+                }
+                else
+                    membersActivity.LastActivityDate = DateTime.UtcNow;
 #pragma warning restore CS8601 // Perhaps the destination is a reference that allows a NULL value. / does not allow
 
                 await _dbContext.AddAsync(voiceActivity);
 
-                if (membersActivity == default)
+                if (membersActivity == null)
                     await _dbContext.AddAsync(membersActivityNew);
                 else
                     _dbContext.Update(membersActivity);
@@ -84,7 +88,7 @@ namespace Squad.Bot.FunctionalModules.Events
             }
         }
 
-        private async Task PrivateRooms(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)
+        public async Task PrivateRooms(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)
         {
             PrivateRooms? savedPortal;
             if (oldState.VoiceChannel == null)
@@ -113,7 +117,10 @@ namespace Squad.Bot.FunctionalModules.Events
                                       manageChannel: PermValue.Allow)
                 };
                 var guildUser = newState.VoiceChannel.Guild.GetUser(user.Id);
-                var newVoiceChannel = await newState.VoiceChannel.Guild.CreateVoiceChannelAsync($"{guildUser.Nickname ?? user.GlobalName ?? user.Username}'s channel", tcp =>
+                var newVoiceChannel = await newState.VoiceChannel.Guild.CreateVoiceChannelAsync(savedPortal.DefaultRoomChannelName.Replace("{game}", user.Activities.First().Name)
+                                                                                                                                  .Replace("{username}", guildUser.Guild.CurrentUser.Nickname ??
+                                                                                                                                                         user.Username ??
+                                                                                                                                                         user.GlobalName), tcp =>
                 {
                     tcp.CategoryId = savedPortal.CategoryID;
                     tcp.PermissionOverwrites = permissions.CreateOptionalOverwrites();
@@ -132,7 +139,7 @@ namespace Squad.Bot.FunctionalModules.Events
             }
         }
 
-        private static bool IsUserOwner(SocketVoiceState state, SocketUser user)
+        private static bool IsUserOwner(in SocketVoiceState state, in SocketUser user)
         {
             var permissions = state.VoiceChannel.GetPermissionOverwrite(user);
             if (permissions != null && permissions.Value.ManageChannel == PermValue.Allow)

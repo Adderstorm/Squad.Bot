@@ -29,7 +29,7 @@ namespace Squad.Bot.FunctionalModules.Commands
         /// <param name="categoryName">The name of the category.</param>
         [SlashCommand("invite", "Create a portal for the private rooms")]
         [DefaultMemberPermissions(GuildPermission.Administrator)]
-        public async Task Invite(string voiceChannelName = "➕・Create", string settingsChannelName = "⚙️・Settings", string categoryName = "Portal")
+        public async Task Invite(string voiceChannelName = "➕・Create", string settingsChannelName = "⚙️・Settings", string categoryName = "Portal", string defaultRoomChannelName = "{username}'s channel")
         {
         N:
             var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
@@ -91,17 +91,18 @@ namespace Squad.Bot.FunctionalModules.Commands
                     CategoryID = category.Id,
                     ChannelID = voiceChannel.Id,
                     SettingsChannelID = settingsChannel.Id,
-                    Guilds = await _dbContext.Guilds.FirstAsync(x => x.Id == Context.Guild.Id)
+                    Guilds = await _dbContext.Guilds.FirstAsync(x => x.Id == Context.Guild.Id),
+                    DefaultRoomChannelName = defaultRoomChannelName,
                 });
                 await _dbContext.SaveChangesAsync();
 
                 //Buttons
                 var rename = new ButtonBuilder().WithCustomId("portal.rename").WithLabel("✏️").WithStyle(ButtonStyle.Secondary);
-                var hide = new ButtonBuilder().WithCustomId("portal.hide").WithLabel("🔒").WithStyle(ButtonStyle.Secondary);
+                var hide = new ButtonBuilder().WithCustomId("portal.hide").WithLabel("👁️").WithStyle(ButtonStyle.Secondary);
+                var owner = new ButtonBuilder().WithCustomId("portal.owner").WithLabel("👤").WithStyle(ButtonStyle.Secondary);
                 var limit = new ButtonBuilder().WithCustomId("portal.limit").WithLabel("🫂").WithStyle(ButtonStyle.Secondary);
                 var kick = new ButtonBuilder().WithCustomId("portal.kick").WithLabel("🚫").WithStyle(ButtonStyle.Secondary);
-                var owner = new ButtonBuilder().WithCustomId("portal.owner").WithLabel("👤").WithStyle(ButtonStyle.Secondary);
-                var lock_ = new ButtonBuilder().WithCustomId("portal.lock").WithLabel("👤").WithStyle(ButtonStyle.Secondary);
+                var lock_ = new ButtonBuilder().WithCustomId("portal.lock").WithLabel("🔒").WithStyle(ButtonStyle.Secondary);
 
                 //Component with buttons
                 var components = new ComponentBuilder().WithButton(rename).WithButton(hide).WithButton(owner).WithButton(limit).WithButton(kick).WithButton(lock_);
@@ -113,9 +114,9 @@ namespace Squad.Bot.FunctionalModules.Commands
                                   "\n" +
                                   "\n✏️ — change the name of the room" +
                                   "\n👁 — hide/show the room" +
+                                  "\n👤 — change the owner of the room" +
                                   "\n🫂 — change the user limit" +
                                   "\n🚫 — kick the participant out of the room" +
-                                  "\n👤 — change the owner of the room" +
                                   "\n🔒 — lock your room",
                     Color = CustomColors.Default,
                 }.WithAuthor(name: "Private room management", iconUrl: "https://cdn.discordapp.com/emojis/963689541724688404.webp?size=128&quality=lossless");

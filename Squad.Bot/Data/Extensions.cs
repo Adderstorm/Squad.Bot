@@ -18,7 +18,7 @@ namespace Squad.Bot.Data
                     context.Database.EnsureCreated();
 
                     var guild = new Guilds { Id = 909801532126543874, ServerName = "Squad" };
-                    var privateRoom = new PrivateRooms { CategoryID = 1187457908292735037, ChannelID = 1187457909811073075, Guilds = guild, SettingsChannelID = 1187457911736258631 };
+                    var privateRoom = new PrivateRooms { CategoryID = 1214971512780623902, ChannelID = 1214971514278117396, Guilds = guild, SettingsChannelID = 1214971516190728253 };
                     context.Guilds.Add(guild);
                     context.PrivateRooms.Add(privateRoom);
                     context.SaveChanges();
