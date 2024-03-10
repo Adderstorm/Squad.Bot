@@ -7,37 +7,37 @@ namespace Squad.Bot.Logging
     {
         private readonly ILogger<Logger> _logger;
 
-        public Logger(ILogger<Logger> logger)
+        public Logger(in ILogger<Logger> logger)
         {
             _logger = logger;
         }
 
-        public void LogInfo(string? message, params object?[] args)
+        public void LogInfo(in string? message, params object?[] args)
         {
             _logger.LogInformation(message: message, args: args);
         }
 
-        public void LogWarning(string? message, Exception? ex, params object?[] args)
+        public void LogWarning(in string? message, in Exception? ex, params object?[] args)
         {
             _logger.LogWarning(message: message, exception: ex, args: args);
         }
 
-        public void LogError(string? message, Exception? ex, params object?[] args)
+        public void LogError(in string? message, in Exception? ex, params object?[] args)
         {
             _logger.LogError(message: message, exception: ex, args: args);
         }
 
-        public void LogCritical(string? message, Exception? ex, params object?[] args)
+        public void LogCritical(in string? message, in Exception? ex, params object?[] args)
         {
             _logger.LogCritical(message: message, exception: ex, args: args);
         }
 
-        public void LogTrace(string? message, Exception? ex, params object?[] args)
+        public void LogTrace(in string? message, in Exception? ex, params object?[] args)
         {
             _logger.LogTrace(message: message, exception: ex, args: args);
         }
 
-        public void LogDebug(string? message, params object?[] args)
+        public void LogDebug(in string? message, params object?[] args)
         {
             _logger.LogDebug(message: message, args: args);
         }
