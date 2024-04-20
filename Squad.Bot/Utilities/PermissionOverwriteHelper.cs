@@ -27,7 +27,7 @@ namespace Squad.Bot.Utilities
         /// </summary>
         /// <param name="targetId">The unique identifier for the object this overwrite is targeting.</param>
         /// <param name="targetType">The type of object this overwrite is targeting.</param>
-        public PermissionOverwriteHelper(in ulong targetId, in PermissionTarget targetType)
+        public PermissionOverwriteHelper(ulong targetId, PermissionTarget targetType)
         {
             TargetId = targetId;
             TargetType = targetType;
