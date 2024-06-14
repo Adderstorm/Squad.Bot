@@ -31,17 +31,17 @@ namespace Squad.Bot.FunctionalModules.Commands
         [DefaultMemberPermissions(GuildPermission.Administrator)]
         public async Task Invite(string voiceChannelName = "➕・Create", string settingsChannelName = "⚙️・Settings", string categoryName = "Portal", string defaultRoomChannelName = "{username}'s channel")
         {
-        N:
             var savedPortal = await _dbContext.PrivateRooms.FirstOrDefaultAsync(x => x.Guilds.Id == Context.Guild.Id);
 
-            if (savedPortal?.CategoryID != null && savedPortal?.ChannelID != null)
+            if (savedPortal != default)
             {
                 if (Context.Guild.GetCategoryChannel(savedPortal.CategoryID) == null && Context.Guild.GetVoiceChannel(savedPortal.ChannelID) == null && Context.Guild.GetTextChannel(savedPortal.SettingsChannelID) == null)
                 {
                     _dbContext.PrivateRooms.Remove(savedPortal);
                     await _dbContext.SaveChangesAsync();
                     // UNSAFE: goto may cause many problems in future
-                    goto N;
+                    await this.Invite(voiceChannelName, settingsChannelName, categoryName, defaultRoomChannelName);
+                    return;
                 }
                 else
                 {
@@ -108,6 +108,9 @@ namespace Squad.Bot.FunctionalModules.Commands
                 var components = new ComponentBuilder().WithButton(rename).WithButton(hide).WithButton(owner).WithButton(limit).WithButton(kick).WithButton(lock_);
 
                 //Final embed
+#pragma warning disable S1075 // URIs should not be hardcoded
+                const string IconUrl = "https://cdn.discordapp.com/emojis/963689541724688404.webp?size=128&quality=lossless";
+#pragma warning restore S1075 // URIs should not be hardcoded
                 var embed = new EmbedBuilder()
                 {
                     Description = "You can change the configuration of your room using interactions." +
@@ -119,7 +122,7 @@ namespace Squad.Bot.FunctionalModules.Commands
                                   "\n🚫 — kick the participant out of the room" +
                                   "\n🔒 — lock your room",
                     Color = CustomColors.Default,
-                }.WithAuthor(name: "Private room management", iconUrl: "https://cdn.discordapp.com/emojis/963689541724688404.webp?size=128&quality=lossless");
+                }.WithAuthor(name: "Private room management", iconUrl: IconUrl);
 
                 await settingsChannel.SendMessageAsync(embed: embed.Build(), components: components.Build());
 

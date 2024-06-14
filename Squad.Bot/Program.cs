@@ -1,6 +1,6 @@
 ﻿namespace Squad.Bot
 {
-    internal class Program
+    internal static class Program
     {
         static void Main() => new Startup().InitializeAsync().GetAwaiter().GetResult();
 

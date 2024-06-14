@@ -21,7 +21,6 @@ namespace Squad.Bot.Discord
         private readonly DiscordSocketClient _client;
         private readonly InteractionService _handler;
         private readonly IServiceProvider _services;
-        private readonly IConfiguration _configuration;
         private readonly Logger _logger;
 
         /// <summary>
@@ -31,12 +30,11 @@ namespace Squad.Bot.Discord
         /// <param name="handler">The InteractionService used to register modules.</param>
         /// <param name="services">The service provider used to resolve dependencies.</param>
         /// <param name="configuration">The configuration used to read bot settings.</param>
-        public InteractionHandler(DiscordSocketClient client, InteractionService handler, IServiceProvider services, IConfiguration configuration, Logger logger)
+        public InteractionHandler(DiscordSocketClient client, InteractionService handler, IServiceProvider services, Logger logger)
         {
             _client = client;
             _handler = handler;
             _services = services;
-            _configuration = configuration;
             _logger = logger;
         }
 
@@ -102,7 +100,8 @@ namespace Squad.Bot.Discord
                         await arg2.Interaction.RespondAsync("Invalid number or arguments", ephemeral: true);
                         break;
                     case InteractionCommandError.Exception:
-                        await arg2.Interaction.RespondAsync($"Command exception: {arg3.ErrorReason}", ephemeral: true);
+                        var embed = new EmbedBuilder().AddField("Error", "Command exception");
+                        await arg2.Interaction.RespondWithFileAsync(filePath: "/app/squad.bot.log",embed: embed.Build(), ephemeral: true);
                         break;
                     case InteractionCommandError.Unsuccessful:
                         await arg2.Interaction.RespondAsync("Command could not be executed", ephemeral: true);
@@ -122,7 +121,7 @@ namespace Squad.Bot.Discord
                 var ctx = new SocketInteractionContext(_client, arg);
                 await _handler.ExecuteCommandAsync(ctx, _services);
             }
-            catch (Exception? ex)
+            catch (Exception ex)
             {
                 _logger.LogError(message: ex.Message, ex: ex);
 #pragma warning disable CS8604 // Possible null reference argument.

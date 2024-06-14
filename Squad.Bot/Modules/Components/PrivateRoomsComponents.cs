@@ -34,9 +34,11 @@ namespace Squad.Bot.FunctionalModules.Components
             }
 
             // Get the category, voice, and text channels associated with the private room
+#pragma warning disable S2259 // Null pointers should not be dereferenced
             var categoryChannel = Context.Guild.GetCategoryChannel(savedPortal.CategoryID);
             var voiceChannel = Context.Guild.GetVoiceChannel(savedPortal.ChannelID);
             var settingsChannel = Context.Guild.GetTextChannel(savedPortal.SettingsChannelID);
+#pragma warning restore S2259 // Null pointers should not be dereferenced
 
             // Delete the category, voice, and text channels on Discord server
             if (voiceChannel != null)
@@ -107,15 +109,11 @@ namespace Squad.Bot.FunctionalModules.Components
         {
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            // waiting when Discord API devs updates select menus(not sure)
-            //var connectedUsers = Context.Guild.GetVoiceChannel(user.VoiceChannel.Id).ConnectedUsers;
-
             var selectMenus = new SelectMenuBuilder(customId: "portal.Kick.Select",
                                                     placeholder: "Select member to kick",
                                                     minValues: 1, maxValues: 1)
                 .WithType(ComponentType.UserSelect)
                 .WithDefaultValues(SelectMenuDefaultValue.FromUser(user));
-            //.WithUserTypes(connectedUsers);
 
             var components = new ComponentBuilder()
                 .WithSelectMenu(selectMenus);
@@ -130,15 +128,11 @@ namespace Squad.Bot.FunctionalModules.Components
         {
             var user = Context.Guild.GetUser(Context.User.Id);
 
-            // waiting when Discord API devs updates select menus(not sure)
-            //var connectedUsers = Context.Guild.GetVoiceChannel(user.VoiceChannel.Id).ConnectedUsers;
-
             var selectMenus = new SelectMenuBuilder(customId: "portal.Owner.Select",
                                                     placeholder: "Select new channel owner",
                                                     minValues: 1, maxValues: 1,
                                                     defaultValues: [SelectMenuDefaultValue.FromUser(user)])
                 .WithType(ComponentType.UserSelect);
-            //.WithUserTypes(connectedUsers);
 
             var components = new ComponentBuilder()
                 .WithSelectMenu(selectMenus);
@@ -206,7 +200,7 @@ namespace Squad.Bot.FunctionalModules.Components
             ulong selectedUserId;
             try
             {
-                selectedUserId = Convert.ToUInt64(selectedUsers.First());
+                selectedUserId = Convert.ToUInt64(selectedUsers[0]);
             }
             catch (Exception ex)
             {
@@ -276,7 +270,7 @@ namespace Squad.Bot.FunctionalModules.Components
             ulong selectedUserId;
             try
             {
-                selectedUserId = Convert.ToUInt64(selectedUsers.First());
+                selectedUserId = Convert.ToUInt64(selectedUsers[0]);
             }
             catch (Exception ex)
             {

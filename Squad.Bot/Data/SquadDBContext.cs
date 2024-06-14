@@ -6,7 +6,7 @@ namespace Squad.Bot.Data
 {
     public class SquadDBContext : DbContext
     {
-        public SquadDBContext(in DbContextOptions<SquadDBContext> options) : base(options)
+        public SquadDBContext(DbContextOptions<SquadDBContext> options) : base(options)
         {
         }
 

@@ -82,10 +82,6 @@ namespace Squad.Bot.FunctionalModules.Events
                 talkTime.Add(socketUser.Id, DateTime.Now);
             }
             // Shit happening here or not :)
-            else
-            {
-
-            }
         }
 
         public async Task PrivateRooms(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)

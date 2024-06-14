@@ -8,12 +8,6 @@ namespace Squad.Bot.FunctionalModules.Modals.ModalsInteraction
 {
     public class PrivateRoomsModals : InteractionModuleBase<SocketInteractionContext>
     {
-        private readonly Logger _logger;
-
-        public PrivateRoomsModals(Logger logger)
-        {
-            _logger = logger;
-        }
 
         [ModalInteraction("renameModal")]
         public async Task RenameModalInteraction(RenameModal modal)

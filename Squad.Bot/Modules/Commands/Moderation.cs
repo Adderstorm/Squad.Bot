@@ -34,7 +34,6 @@ namespace Squad.Bot.FunctionalModules.Commands
         [SlashCommand("kick", "kick user")]
         [DefaultMemberPermissions(GuildPermission.KickMembers)]
         [RequireBotPermission(GuildPermission.KickMembers)]
-        [EnabledInDm(false)]
         public async Task Kick(IUser user, string Reason)
         {
             var member = Context.Guild.GetUser(user.Id);
@@ -97,7 +96,6 @@ namespace Squad.Bot.FunctionalModules.Commands
         [SlashCommand("nick", "changes nick")]
         [DefaultMemberPermissions(GuildPermission.ManageNicknames)]
         [RequireBotPermission(GuildPermission.ManageNicknames)]
-        [EnabledInDm(false)]
         public async Task Nick(IUser user, string nickname)
         {
 
@@ -143,7 +141,6 @@ namespace Squad.Bot.FunctionalModules.Commands
         [SlashCommand("ban", "ban user")]
         [DefaultMemberPermissions(GuildPermission.BanMembers)]
         [RequireBotPermission(GuildPermission.BanMembers)]
-        [EnabledInDm(false)]
         public async Task Ban(IUser user, string reason, bool notify = true)
         {
             var member = Context.Guild.GetUser(user.Id);
@@ -205,7 +202,6 @@ namespace Squad.Bot.FunctionalModules.Commands
         [SlashCommand("purge", "The amount of messages that should be deleted.")]
         [DefaultMemberPermissions(GuildPermission.ManageMessages)]
         [RequireBotPermission(GuildPermission.ManageMessages)]
-        [EnabledInDm(false)]
         public async Task Purge(short amount = 0)
         {
             SocketInteractionContext ctx = new(Context.Client, Context.Interaction);

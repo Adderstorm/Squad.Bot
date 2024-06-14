@@ -27,8 +27,6 @@ namespace Squad.Bot
 #endif
             .Build();
 
-        private DiscordSocketClient? _client;
-
 
         /// <summary>
         /// Initializes the bot by setting up its services and dependencies.
@@ -57,7 +55,7 @@ namespace Squad.Bot
             IServiceProvider services = serviceScope.ServiceProvider;
 
             // Get the DiscordSocketClient service from the service provider
-            _client = services.GetRequiredService<DiscordSocketClient>();
+            DiscordSocketClient? _client = services.GetRequiredService<DiscordSocketClient>();
 
             // Initialize the InteractionHandler service, which will register and execute commands
             await services.GetRequiredService<InteractionHandler>().InitializeAsync();

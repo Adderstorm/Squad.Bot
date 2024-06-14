@@ -3,9 +3,9 @@ using Discord.Interactions;
 
 namespace Squad.Bot.FunctionalModules.Preconditions
 {
-    public class IsUserOwner : PreconditionAttribute
+    public class IsUserOwnerAttribute : PreconditionAttribute
     {
-        public new string ErrorMessage = "You are not the owner";
+        public new const string ErrorMessage = "You are not the owner";
         public async override Task<PreconditionResult> CheckRequirementsAsync(IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services)
         {
             var user = await context.Guild.GetUserAsync(context.User.Id);

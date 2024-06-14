@@ -66,6 +66,11 @@ namespace Squad.Bot.FunctionalModules.Events
                 TotalUsers = socketGuild.MemberCount,
             };
 #pragma warning restore CS8601 // Perhaps the destination is a reference that allows a NULL value. / P.S. does not allow
+
+            await _dbContext.AddAsync(leftDate);
+            await _dbContext.AddAsync(totalMembers);
+
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task OnUserMessageReceived(SocketMessage message)

@@ -5,6 +5,9 @@
     },
     "Docker": {
       "commandName": "Docker"
+    },
+    "Container (.NET SDK)": {
+      "commandName": "SdkContainer"
     }
   }
 }

@@ -5,9 +5,9 @@ using Squad.Bot.Data;
 
 namespace Squad.Bot.FunctionalModules.Preconditions
 {
-    public class IsUserInPRoom : PreconditionAttribute
+    public class IsUserInPRoomAttribute : PreconditionAttribute
     {
-        public new string ErrorMessage = "You are not in a private room";
+        public new const string ErrorMessage = "You are not in a private room";
         public override async Task<PreconditionResult> CheckRequirementsAsync(IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services)
         {
 #pragma warning disable CS8600 // Converting a literal that allows a NULL value or a possible NULL value to a type that does not allow a NULL value.
@@ -17,10 +17,12 @@ namespace Squad.Bot.FunctionalModules.Preconditions
             var savedPortal = dbContext.PrivateRooms.FirstOrDefault(x => x.Guilds.Id == context.Guild.Id);
             var user = await context.Guild.GetUserAsync(context.User.Id);
 
+#pragma warning disable S2259 // Null pointers should not be dereferenced
             if (context.Channel.Id == savedPortal.SettingsChannelID && user.VoiceChannel?.CategoryId == savedPortal.CategoryID)
                 return PreconditionResult.FromSuccess();
             else
                 return PreconditionResult.FromError(ErrorMessage);
+#pragma warning restore S2259 // Null pointers should not be dereferenced
         }
     }
 }
